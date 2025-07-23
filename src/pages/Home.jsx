@@ -1,6 +1,6 @@
 
 import React from "react";
-import "../styles/home.css";
+import "../styles/Home.css";
 import homeImage from '../assets/home.jpg';
 // import { Button } from "react-bootstrap/Button";
 
@@ -23,7 +23,7 @@ const HomePage = () => {
         
             <h1>خبزك في متناول يدك</h1>
             <h4>احجز العيش و مستلزماتك اليومية بسهولة من أقرب مخبز ليك</h4>
-            <button className="cta-btn">ابدأ الآن</button>
+            <button className="start-btn">ابدأ الآن</button>
           
           </div>
       </header>
