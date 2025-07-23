@@ -1,7 +1,9 @@
+
 import React from "react";
 import "../styles/home.css";
 import homeImage from '../assets/home.jpg';
 // import { Button } from "react-bootstrap/Button";
+
 
 
 const HomePage = () => {
@@ -25,6 +27,7 @@ const HomePage = () => {
           
           </div>
       </header>
+
     </div>
   );
 };
