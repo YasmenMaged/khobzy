@@ -1,0 +1,31 @@
+:root {
+  --color-brown-text: #4A2C2A;
+  --color-brown-text-hover: #D9A321;
+  /* --color-bg-light: #FDF9F4; */
+  --color-bg-light: #f0eadc;
+}
+
+.navbar-custom {
+  background-color: var(--color-bg-light);
+  padding: 10px 20px;
+  direction: rtl;
+  font-size: 20px;
+ font-family: "Aref Ruqaa", serif;
+ 
+}
+
+.navbar-custom .navbar-brand ,
+.navbar-custom .nav-link {
+  color: var(--color-brown-text) !important;
+  font-weight: bold;
+}
+
+.navbar-custom .nav-link:hover {
+  color: var(--color-brown-text-hover) !important;
+  font-weight: bold;
+}
+
+.navbar-custom .nav-link.active {
+  color: var(--color-brown-text) !important;
+}
+

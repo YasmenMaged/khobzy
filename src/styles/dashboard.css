@@ -1,8 +1,8 @@
 /* General Styles */
-:root {
-  --sidebar-bg: #2c3e50;
+/* :root {
+  --sidebar-bg: #4A2C2A;
   --sidebar-text: #ecf0f1;
-  --sidebar-active: #3498db;
+  --sidebar-active: #E0B243;
   --sidebar-hover: #34495e;
   --main-bg: #f5f7fa;
   --card-bg: #ffffff;
@@ -17,17 +17,19 @@ body {
   padding: 0;
   direction: rtl;
   background-color: var(--main-bg);
-}
+} */
 
 /* Dashboard Layout */
-.dashboard-container {
+/* .dashboard-container {
+ 
+  
   display: flex;
   min-height: 100vh;
-}
+} */
 
 /* Sidebar Styles */
 .sidebar {
-  width: 280px;
+  width: 20%;
   background-color: var(--sidebar-bg);
   color: var(--sidebar-text);
   padding: 0;
@@ -35,13 +37,14 @@ body {
 }
 
 .sidebar-header {
+  margin-top: 50px;
   padding: 20px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .sidebar-title {
   margin: 0;
-  font-size: 1.3rem;
+  font-size: 1.5rem;
   font-weight: 600;
   text-align: center;
 }
@@ -88,14 +91,7 @@ body {
   padding: 2px 8px;
   border-radius: 10px;
 }
-/* Home Page Styles */
-.home-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
-}
+
 
 .auth-box {
   background-color: white;

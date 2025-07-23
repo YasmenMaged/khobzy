@@ -1,65 +1,49 @@
+
 .home-container {
-  font-family: 'Cairo', sans-serif;
+     display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+ font-family: "Aref Ruqaa", serif;
   direction: rtl;
   text-align: right;
+  font-size: 50px;
 }
 
-.hero-section {
-  background-size: cover;
-  background-position: center;
-  height: 100vh;
-  position: relative;
-  color: white;
-}
-
-
-.logo {
-  width: 120px;
-}
-
-.nav-links {
-  list-style: none;
-  display: flex;
-  gap: 20px;
-  margin: 0;
-  padding: 0;
-}
-
-.nav-links a {
-  color: white;
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 18px;
-}
 
 .hero-content {
   position: absolute;
   top: 50%;
-  right: 10%;
+  right: 5%;
   transform: translateY(-50%);
   max-width: 500px;
+  
 }
 
 .hero-content h1 {
   font-size: 48px;
   margin-bottom: 20px;
   font-weight: bold;
+    color: #4A2C2A;
 }
 
-.hero-content p {
+.hero-content h4 {
   font-size: 20px;
   margin-bottom: 30px;
+     color: #4A2C2A;
+     font-size: 25px;
+
 }
 
 .cta-btn {
-  background-color: #F4A261;
+  background-color: #D9A321;
   border: none;
-  font-size: 18px;
+  font-size: 25px;
   padding: 10px 30px;
   border-radius: 30px;
   color: white;
 }
 
 .cta-btn:hover {
-  background-color: #e08948;
+  background-color: #b68717;
 }

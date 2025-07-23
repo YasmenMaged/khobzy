@@ -1,65 +1,85 @@
 import React from 'react';
-import '../styles/dashboard.css';
 import { Link } from 'react-router-dom';
-
+import '../styles/dashBoardStyle.css';
 const Dashboard = () => {
-  return (
-    <div className="dashboard-container">
-      {/* Sidebar */}
-      <div className="sidebar">
-        <div className="sidebar-header">
-          <h4 className="sidebar-title">مصارفاهيئة</h4>
-        </div>
-        <nav className="sidebar-nav">
-          <Link to="/" className="sidebar-link active">
-            <span className="english-text">Dashboard</span>
-            <span className="arabic-text">الأربعة الثامنة</span>
-            <span className="sidebar-count">250</span>
-          </Link>
-          <Link to="/dashboard" className="sidebar-link">
-            <span className="arabic-text">العدد الفعل اليوم</span>
-            <span className="sidebar-count">5</span>
-          </Link>
-          <Link to="/dashboard" className="sidebar-link">
-            <span className="arabic-text">المجموعات</span>
-          </Link>
-        </nav>
-      </div>
+  const orders = [
+    { name: 'أحمد علي', time: '10:30 AM', quantity: 5 },
+    { name: 'فاطمة محمد', time: '9:43 AM', quantity: 3 },
+    { name: 'خالد عبد الله', time: '8:15 AM', quantity: 10 },
+  ];
 
-      {/* Main Content */}
-      <div className="main-content">
-        <h1 className="dashboard-title">Daschbárd</h1>
-        
-        {/* Stats Cards */}
-        <div className="stats-grid">
-          <div className="stat-column">
-            <h3 className="column-title">النظر</h3>
-            <div className="stat-item">أعداد على 1080 ص</div>
-            <div className="stat-item">حقة حسن 950 ص</div>
-            <div className="stat-item">ذلك الهام من 900 ص</div>
-            <div className="stat-item">ثم</div>
+  return (
+    <div className="container-fluid dashboard" dir="rtl">
+      <div className="row ">
+        <div className="col-md-2 dash-sidebar vh-100 p-3">
+          <h5 className="mb-4">لوحة التحكم</h5>
+          <ul className="nav flex-column">
+            <li className="nav-item mb-2"><Link className="nav-link" to="#">نظرة عامة</Link></li>
+            <li className="nav-item mb-2"><Link className="nav-link" to="#">الطلبات</Link></li>
+            <li className="nav-item mb-2"><Link className="nav-link" to="#">سجل الطلبات</Link></li>
+            <li className="nav-item mb-2"><Link className="nav-link" to="#">إدارة الإنتاج</Link></li>
+          </ul>
+        </div>
+
+        <div className="col-md-10 p-4">
+          <div className="row mb-4">
+            <div className="col-md-3">
+              <div className="border rounded p-3 text-center">
+                <h5>إعداد الطلبات اليوم</h5>
+                <p>120</p>
+              </div>
+            </div>
+            <div className="col-md-3">
+              <div className="border rounded p-3 text-center">
+                <h5>التغليف اليوم</h5>
+                <p>25</p>
+              </div>
+            </div>
+            <div className="col-md-3">
+              <div className="border rounded p-3 text-center">
+                <h5>الرغيف الباقي</h5>
+                <p>50</p>
+              </div>
+            </div>
+            <div className="col-md-3">
+              <div className="border rounded p-3 text-center">
+                <h5>الإشغال</h5>
+                <p>75%</p>
+              </div>
+            </div>
           </div>
-          <div className="stat-column">
-            <h3 className="column-title">الكمية</h3>
-            <div className="stat-item">10 ص</div>
-            <div className="stat-item">5 ص</div>
-            <div className="stat-item">3 ص</div>
-            <div className="stat-item">ثم</div>
+
+          <h5 className="mb-3">الطلبات الحالية</h5>
+          <table className="table table-bordered">
+            <thead className="table-light">
+              <tr>
+                <th>اسم العميل</th>
+                <th>وقت الحجز</th>
+                <th>الكمية</th>
+                <th>حالة الطلب</th>
+              </tr>
+            </thead>
+            <tbody>
+              {orders.map((order, index) => (
+                <tr key={index}>
+                  <td>{order.name}</td>
+                  <td>{order.time}</td>
+                  <td>{order.quantity}</td>
+                  <td>محجوز</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          <div className="mt-4">
+            <h5>سجل الطلبات</h5>
+            <div className="form-group mt-3">
+              <label htmlFor="production">كم رغيف هتنتج بكرة؟</label>
+              <input type="number" className="form-control w-25" id="production" defaultValue="200" />
+              <button className="btn btn-primary mt-2">تحديث</button>
+            </div>
           </div>
-          <div className="stat-column">
-            <h3 className="column-title">العملة</h3>
-            <div className="stat-item">نجد الدكتار</div>
-            <div className="stat-item">ثم</div>
-            <div className="stat-item">ثم</div>
-            <div className="stat-item">ثم</div>
-          </div>
-          <div className="stat-column">
-            <h3 className="column-title">الموعد</h3>
-            <div className="stat-item">10:90 ص</div>
-            <div className="stat-item">5:50 ص</div>
-            <div className="stat-item">3:00 ص</div>
-            <div className="stat-item">ثم</div>
-          </div>
+
         </div>
       </div>
     </div>

@@ -1,0 +1,34 @@
+:root {
+  --sidebar-bg: #4A2C2A;
+  --sidebar-text: #ecf0f1;
+  --sidebar-active: #E0B243;
+  --sidebar-hover: #34495e;
+  --main-bg: #f5f7fa;
+  --card-bg: #ffffff;
+  --text-dark: #2c3e50;
+  --text-light: #7f8c8d;
+  --border-color: #e0e0e0;
+}
+.dashboard{
+    margin-top: 62px
+}
+
+.dash-sidebar{
+    background-color:var(--sidebar-bg);
+    color:var(--sidebar-text)
+}
+.dash-sidebar h5{
+    color:#F0EADC;
+    text-align: center;
+    font-style: italic;
+   
+
+}
+.nav-link 
+{
+    color: var(--sidebar-text) !important;
+}
+
+.dash-sidebar .nav-link.active {
+    background-color: var(--sidebar-active) !important;
+}
