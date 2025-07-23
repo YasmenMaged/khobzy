@@ -2,19 +2,11 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 const Navbar = () => (
-  <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div className="container">
-      <Link className="navbar-brand" to="/">خبزك</Link>
-      <div className="collapse navbar-collapse">
-        <ul className="navbar-nav ms-auto">
-          <li className="nav-item">
-            <Link className="nav-link" to="/">الرئيسية</Link>
-          </li>
-          <li className="nav-item">
-            <Link className="nav-link" to="/dashboard">لوحة التحكم</Link>
-          </li>
-        </ul>
-      </div>
+  <nav className="navbar">
+    <div className="navbar-brand">خبزك</div>
+    <div className="navbar-links">
+      <Link to="/" className="nav-link">الرئيسية</Link>
+      <Link to="/dashboard" className="nav-link">لوحة التحكم</Link>
     </div>
   </nav>
 );
