@@ -1,0 +1,43 @@
+
+.bakery-card {
+border: none;
+border-radius: 16px;
+box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+transition: transform 0.2s ease;
+background-color: #fffef9;
+}
+
+.bakery-card:hover {
+transform: translateY(-5px);
+}
+
+.bakery-card-title {
+font-weight: bold;
+font-size: 1.3rem;
+color: #333;
+}
+
+.bakery-card-address {
+font-size: 0.9rem;
+color: #777;
+}
+
+.bakery-card-text {
+font-size: 1rem;
+color: #444;
+margin-bottom: 10px;
+}
+
+.bakery-card-button {
+background-color: #ffca2c;
+color: #000;
+border: none;
+border-radius: 8px;
+font-weight: bold;
+transition: 0.3s;
+}
+
+.bakery-card-button:hover {
+background-color: #e0a800;
+color: white;
+}

@@ -1,10 +1,13 @@
+
 import React from "react";
 import "../styles/home.css";
 // import { Button } from "react-bootstrap/Button";
 
 
+
 const HomePage = () => {
   return (
+
     <div className="home-container">
       <header className="hero-section">
        
@@ -15,6 +18,7 @@ const HomePage = () => {
           
         </div>
       </header>
+
     </div>
   );
 };
