@@ -1,17 +1,22 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import './styles/Home.css';
+import React from "react";
+import "../styles/home.css";
+// import { Button } from "react-bootstrap/Button";
 
-const Home = () => {
+
+const HomePage = () => {
   return (
     <div className="home-container">
-      <header className="hero-section text-center p-5">
-        <h1 className="display-4 fw-bold">مرحبا بك في خبزك</h1>
-        <p className="lead">احجز خبزك بسهولة من أقرب مخبز</p>
-        <Link to="/dashboard" className="btn btn-primary mt-3">ابدأ الآن</Link>
+      <header className="hero-section">
+       
+          <div className="hero-content">
+            <h1>خبزك في متناول يدك</h1>
+            <p>احجز العيش و مستلزماتك اليومية بسهولة من أقرب مخبز ليك</p>
+            <button className="cta-btn">ابدأ الآن</button>
+          
+        </div>
       </header>
     </div>
   );
 };
 
-export default Home;
+export default HomePage;

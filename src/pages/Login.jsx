@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../services/firebase';
 import { useNavigate } from 'react-router-dom';
+import '../styles/auth.css';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -20,13 +21,32 @@ export default function Login() {
   };
 
   return (
-    <div className="container mt-5" style={{ maxWidth: '450px' }}>
-      <h3 className="text-center mb-4">تسجيل الدخول</h3>
-      <form onSubmit={handleLogin}>
-        <input className="form-control mb-3" type="email" placeholder="الإيميل" value={email} onChange={e => setEmail(e.target.value)} />
-        <input className="form-control mb-3" type="password" placeholder="كلمة المرور" value={password} onChange={e => setPassword(e.target.value)} />
-        <button className="btn btn-success w-100" type="submit">دخول</button>
-      </form>
+    <div className="auth-container">
+      <div className="auth-card">
+        <div className="logo">
+          <h1>خبزك</h1>
+          <span className="bread-icon">🍞</span>
+        </div>
+        <form onSubmit={handleLogin} className="auth-form">
+          <input
+            type="email"
+            className="form-control mb-3"
+            placeholder="الإيميل"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <input
+            type="password"
+            className="form-control mb-3"
+            placeholder="كلمة المرور"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <button type="submit" className="btn btn-custom w-100">
+            تسجيل الدخول
+          </button>
+        </form>
+      </div>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import React from 'react';
 
 const Footer = () => (
-  <footer className="text-center mt-5 p-3 bg-dark text-white">
+  <footer className="footer">
     <p>© 2025 خبزك - جميع الحقوق محفوظة</p>
   </footer>
 );
