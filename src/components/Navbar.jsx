@@ -9,7 +9,7 @@ const Navbar = () => {
     >
       <div className="container-fluid">
         <Link className="navbar-brand  fs-4" to="/" style={{ fontWeight: 'bold' }}>
-        خبزي
+خبزي        
         </Link>
 
         <button
@@ -38,8 +38,8 @@ const Navbar = () => {
               </Link>
             </li>
             <li className="nav-item">
-              <Link className="nav-link " to="/login">
-                تسجيل الخروج
+              <Link className="nav-link " to="/choose-role">
+                تسجيل الدخول
               </Link>
             </li>
           </ul>
