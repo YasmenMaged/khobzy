@@ -9,6 +9,7 @@ import Reservations from './pages/Reservations';
 import Login from './pages/Login';
 import BakerySignup from './pages/BakerySignUp';
 import UserTypeSelection from './pages/UserTypeSelection';
+import { UserContextProvider } from './context/UserContext';
 
 function AppContent() {
 const location = useLocation();
@@ -35,9 +36,11 @@ return (
 
 function App() {
 return (
+<UserContextProvider>
 <BrowserRouter>
 <AppContent />
 </BrowserRouter>
+</UserContextProvider>
 );
 }
 

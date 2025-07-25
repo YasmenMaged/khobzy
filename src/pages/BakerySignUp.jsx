@@ -2,7 +2,13 @@ import React, { useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { useUser } from "../context/UserContext";
+import mockUsers from "../modules/mock_users.json";
+import "../styles/auth.css";
+
 
 const governoratesData = {
   القاهرة: ["المعادي", "مصر الجديدة", "مدينة نصر", "حلوان", "الساحل", "شبرا"],
@@ -27,12 +33,15 @@ const governoratesData = {
 
 const BakerySignup = () => {
   const navigate = useNavigate();
+  const { setUserType } = useUser();
   const [districts, setDistricts] = useState([]);
 
   const formik = useFormik({
     initialValues: {
       name: "",
       nationalId: "",
+      phone: "",
+      password: "",
       bakeryName: "",
       governorate: "",
       district: "",
@@ -43,14 +52,37 @@ const BakerySignup = () => {
       nationalId: Yup.string()
         .matches(/^\d{14}$/, "يجب أن يكون الرقم القومي 14 رقمًا")
         .required("الرقم القومي مطلوب"),
+      phone: Yup.string()
+        .matches(/^\d{11}$/, "يجب أن يكون رقم الهاتف 11 رقمًا")
+        .required("رقم الهاتف مطلوب"),
+      password: Yup.string()
+        .min(6, "كلمة المرور يجب أن تكون 6 أحرف على الأقل")
+        .required("كلمة المرور مطلوبة"),
       bakeryName: Yup.string().required("اسم المخبز مطلوب"),
       governorate: Yup.string().required("المحافظة مطلوبة"),
       district: Yup.string().required("المركز مطلوب"),
       village: Yup.string(),
     }),
     onSubmit: (values) => {
-      console.log("Form submitted:", values);
-      navigate("/"); // Navigate to home page after successful submit
+      const baker = mockUsers.bakers.find(
+        (baker) =>
+          baker.national_id === values.nationalId && baker.phone === values.phone
+      );
+
+      if (baker) {
+        setUserType("owner");
+        console.log("Form submitted:", values);
+        navigate("/");
+      } else {
+        toast.error("ليس لديك مخبز", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
+      }
     },
   });
 
@@ -67,19 +99,19 @@ const BakerySignup = () => {
     ) : null;
 
   return (
-    <div className="d-flex" style={{ height: "100vh", overflow: "hidden", direction: "rtl" }}>
-     
-
+    <div className="d-flex flex-column flex-md-row" style={{ minHeight: "100vh", direction: "rtl" }}>
       {/* Form section */}
-      <div className="w-50 d-flex align-items-center justify-content-center" >
+      <div className="w-100 w-md-50 d-flex align-items-center justify-content-center p-3">
         <div
           className="w-100"
           style={{
             maxWidth: "500px",
-            padding: "40px",
+            padding: "20px",
             backgroundColor: "#fff",
             borderRadius: "8px",
             boxShadow: "0 0 10px rgba(0,0,0,0.1)",
+            overflowY: "auto",
+            maxHeight: "90vh",
           }}
         >
           <h2 className="text-center mb-4" style={{ color: "#4A2C2A", fontFamily: "Aref Ruqaa" }}>
@@ -117,6 +149,36 @@ const BakerySignup = () => {
               {getFieldError("nationalId")}
             </div>
 
+            {/* Phone */}
+            <div className="mb-3">
+              <label htmlFor="phone" className="form-label">رقم الهاتف</label>
+              <input
+                id="phone"
+                name="phone"
+                type="text"
+                className="form-control"
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                value={formik.values.phone}
+              />
+              {getFieldError("phone")}
+            </div>
+
+            {/* Password */}
+            <div className="mb-3">
+              <label htmlFor="password" className="form-label">كلمة المرور</label>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                className="form-control"
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                value={formik.values.password}
+              />
+              {getFieldError("password")}
+            </div>
+
             {/* Bakery Name */}
             <div className="mb-3">
               <label htmlFor="bakeryName" className="form-label">اسم المخبز</label>
@@ -138,7 +200,7 @@ const BakerySignup = () => {
               <select
                 id="governorate"
                 name="governorate"
-                className="form-select"
+                className="form-select custom-select"
                 onChange={handleGovernorateChange}
                 onBlur={formik.handleBlur}
                 value={formik.values.governorate}
@@ -157,7 +219,7 @@ const BakerySignup = () => {
               <select
                 id="district"
                 name="district"
-                className="form-select"
+                className="form-select custom-select"
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 value={formik.values.district}
@@ -186,27 +248,37 @@ const BakerySignup = () => {
             </div>
 
             {/* Submit Button */}
-            <button type="submit" className="btn  w-100 mt-3" style={{ backgroundColor: "#E0B243", color: "#FFFFFF", fontSize: "18px" }}>
+            <button type="submit" className="btn w-100 mt-3" style={{ backgroundColor: "#E0B243", color: "#FFFFFF", fontSize: "18px" }}>
               تسجيل
             </button>
+                 <p className="mt-3 text-center">
+                لديك حساب بالفعل؟ {" "}
+                <a href="/login" style={{ color: "#E0B243", textDecoration: "underline" }}>
+                  تسجيل الدخول
+                </a>
+              </p>
           </form>
         </div>
       </div>
 
-
-       {/* Image section */}
-      <div className="w-50 h-100">
-        <img
-          src={require('../assets/login1.avif')}
+      {/* Image section */}
+      <div className="w-100 w-md-50 d-flex align-items-center justify-content-center p-3">
+        <div style={{ maxHeight: "90vh", overflow: "hidden" }}>
+          <img
+            src={require('../assets/login1.avif')}
             alt="bread"
             style={{
-              width: '100%',
-              height: '100%',
-              maxHeight: '100vh',
-              objectFit: 'contain',
+              width: "100%",
+              height: "auto",
+              maxHeight: "90vh",
+              objectFit: "cover",
             }}
-        />
+          />
+        </div>
       </div>
+
+      {/* Toast Container */}
+      <ToastContainer />
     </div>
   );
 };

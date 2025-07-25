@@ -2,6 +2,8 @@ import React from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useNavigate, Link } from 'react-router-dom';
+import "../styles/auth.css";
+
 
 const Login = () => {
   const navigate = useNavigate();

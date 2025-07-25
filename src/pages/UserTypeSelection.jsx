@@ -1,10 +1,13 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { useUser } from "../context/UserContext";
 
 const UserTypeSelection = () => {
   const navigate = useNavigate();
+  const { setUserType } = useUser();
 
   const handleSelection = (type) => {
+    setUserType(type); // Store the user type in context
     if (type === "citizen") navigate("/signup");
     else if (type === "owner") navigate("/bakerysignup");
   };

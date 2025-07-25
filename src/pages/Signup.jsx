@@ -6,6 +6,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import users from "../modules/mock_users.json";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import "../styles/auth.css";
 
 const governoratesData = {
   القاهرة: ["المعادي", "مصر الجديدة", "مدينة نصر", "حلوان", "الساحل", "شبرا"],
@@ -76,7 +77,7 @@ const Signup = () => {
         return;
       }
 
-      console.log(values);
+      localStorage.setItem("userType", "citizen");
       navigate("/");
     },
   });
@@ -94,113 +95,136 @@ const Signup = () => {
     ) : null;
 
   return (
-    <div className="container-fluid" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center' }}>
-      <ToastContainer />
-      <div className="row flex-grow-1 w-100 " >
-        <div className="col-md-6 d-flex align-items-center justify-content-center" >
-          <div className="w-100" style={{ maxWidth: "500px", height:"100vh",backgroundColor: "#fff", padding: "0px 40px 40px 40px", borderRadius: "8px", boxShadow: "0 0 10px rgba(0,0,0,0.1)" }}>
-            <h1 className="text-center mb-1" style={{ color: "#4A2C2A", fontFamily: "Aref Ruqaa" }}>  إنشاء حساب خبزي</h1>
-            <form onSubmit={formik.handleSubmit} noValidate>
-              {["nationalId", "email", "password", "phone"].map((field) => (
-                <div className="mb-1" key={field}>
-                  <label htmlFor={field} className="form-label" style={{ color: "#2E1C1A" }}>
-                    {{
-                      nationalId: "الرقم القومي",
-                      email: "البريد الإلكتروني",
-                      password: "كلمة السر",
-                      phone: "رقم التليفون",
-                    }[field]}
-                  </label>
-                  <input
-                    type={field === "password" ? "password" : "text"}
-                    id={field}
-                    name={field}
-                    className="form-control"
-                    style={{ backgroundColor: "#E5E5E5" }}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    value={formik.values[field]}
-                  />
-                  {getFieldError(field)}
-                </div>
-              ))}
-              <div className="mb-1">
-                <label htmlFor="governorate" className="form-label" style={{ color: "#2E1C1A" }}>
-                  المحافظة
-                </label>
-                <select
-                  id="governorate"
-                  name="governorate"
-                  className="form-select"
-                  style={{ backgroundColor: "#E5E5E5" }}
-                  onChange={handleGovernorateChange}
-                  onBlur={formik.handleBlur}
-                  value={formik.values.governorate}
-                >
-                  <option value="">اختر محافظة</option>
-                  {Object.keys(governoratesData).map((gov) => (
-                    <option key={gov} value={gov}>{gov}</option>
-                  ))}
-                </select>
-                {getFieldError("governorate")}
-              </div>
-              <div className="mb-2">
-                <label htmlFor="district" className="form-label" style={{ color: "#2E1C1A" }}>
-                  المركز
-                </label>
-                <select
-                  id="district"
-                  name="district"
-                  className="form-select"
-                  style={{ backgroundColor: "#E5E5E5" }}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  value={formik.values.district}
-                  disabled={!formik.values.governorate}
-                >
-                  <option value="">اختر مركز</option>
-                  {districts.map((dist) => (
-                    <option key={dist} value={dist}>{dist}</option>
-                  ))}
-                </select>
-                {getFieldError("district")}
-              </div>
-              <div className="mb-3">
-                <label htmlFor="village" className="form-label" style={{ color: "#2E1C1A" }}>
-                  القرية (اختياري)
+    <div className="d-flex flex-column flex-md-row" style={{ minHeight: "100vh", direction: "rtl" }}>
+      {/* Form section */}
+      <div className="w-100 w-md-50 d-flex align-items-center justify-content-center p-3">
+        <div
+          className="w-100"
+          style={{
+            maxWidth: "500px",
+            padding: "20px",
+            backgroundColor: "#fff",
+            borderRadius: "8px",
+            boxShadow: "0 0 10px rgba(0,0,0,0.1)",
+            overflowY: "auto",
+            maxHeight: "90vh",
+          }}
+        >
+          <h2 className="text-center mb-4" style={{ color: "#4A2C2A", fontFamily: "Aref Ruqaa" }}>
+            إنشاء حساب خبزي
+          </h2>
+          <form onSubmit={formik.handleSubmit} noValidate>
+            {["nationalId", "email", "password", "phone"].map((field) => (
+              <div className="mb-3" key={field}>
+                <label htmlFor={field} className="form-label" style={{ color: "#2E1C1A" }}>
+                  {{
+                    nationalId: "الرقم القومي",
+                    email: "البريد الإلكتروني",
+                    password: "كلمة السر",
+                    phone: "رقم التليفون",
+                  }[field]}
                 </label>
                 <input
-                  type="text"
-                  id="village"
-                  name="village"
+                  type={field === "password" ? "password" : "text"}
+                  id={field}
+                  name={field}
                   className="form-control"
                   style={{ backgroundColor: "#E5E5E5" }}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
-                  value={formik.values.village}
+                  value={formik.values[field]}
                 />
-                {getFieldError("village")}
+                {getFieldError(field)}
               </div>
-              <button type="submit" className="btn w-100" style={{ backgroundColor: "#E0B243", color: "#FFFFFF", fontSize: "18px" }}>
-                تسجيل
-              </button>
-              <p className="mt-1 mb-1 text-center">
-                لديك حساب بالفعل؟ {" "}
-                <a href="/login" style={{ color: "#E0B243", textDecoration: "underline" }}>
-                  تسجيل الدخول
-                </a>
-              </p>
-            </form>
-          </div>
+            ))}
+            <div className="mb-3">
+              <label htmlFor="governorate" className="form-label" style={{ color: "#2E1C1A" }}>
+                المحافظة
+              </label>
+              <select
+                id="governorate"
+                name="governorate"
+                className="form-select custom-select"
+                style={{ backgroundColor: "#E5E5E5" }}
+                onChange={handleGovernorateChange}
+                onBlur={formik.handleBlur}
+                value={formik.values.governorate}
+              >
+                <option value="">اختر محافظة</option>
+                {Object.keys(governoratesData).map((gov) => (
+                  <option key={gov} value={gov}>{gov}</option>
+                ))}
+              </select>
+              {getFieldError("governorate")}
+            </div>
+            <div className="mb-3">
+              <label htmlFor="district" className="form-label" style={{ color: "#2E1C1A" }}>
+                المركز
+              </label>
+              <select
+                id="district"
+                name="district"
+                className="form-select custom-select"
+                style={{ backgroundColor: "#E5E5E5" }}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                value={formik.values.district}
+                disabled={!formik.values.governorate}
+              >
+                <option value="">اختر مركز</option>
+                {districts.map((dist) => (
+                  <option key={dist} value={dist}>{dist}</option>
+                ))}
+              </select>
+              {getFieldError("district")}
+            </div>
+            <div className="mb-3">
+              <label htmlFor="village" className="form-label" style={{ color: "#2E1C1A" }}>
+                القرية (اختياري)
+              </label>
+              <input
+                type="text"
+                id="village"
+                name="village"
+                className="form-control"
+                style={{ backgroundColor: "#E5E5E5" }}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                value={formik.values.village}
+              />
+              {getFieldError("village")}
+            </div>
+            <button type="submit" className="btn w-100 mt-3" style={{ backgroundColor: "#E0B243", color: "#FFFFFF", fontSize: "18px" }}>
+              تسجيل
+            </button>
+            <p className="mt-3 text-center">
+              لديك حساب بالفعل؟ {" "}
+              <a href="/login" style={{ color: "#E0B243", textDecoration: "underline" }}>
+                تسجيل الدخول
+              </a>
+            </p>
+          </form>
         </div>
-        <div className="col-md-6 d-none d-md-block p-0 ">
+      </div>
+
+      {/* Image section */}
+      <div className="w-100 w-md-50 d-flex align-items-center justify-content-center p-3">
+        <div style={{ maxHeight: "90vh", overflow: "hidden" }}>
           <img
             src={require('../assets/login1.avif')}
             alt="bread"
-            style={{ width: '100%', height: '100%', maxHeight: '100vh', objectFit: 'contain' }}
+            style={{
+              width: "100%",
+              height: "auto",
+              maxHeight: "90vh",
+              objectFit: "cover",
+            }}
           />
         </div>
       </div>
+
+      {/* Toast Container */}
+      <ToastContainer />
     </div>
   );
 };
