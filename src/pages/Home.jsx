@@ -1,6 +1,6 @@
 
 import React from "react";
-import "../styles/home.css";
+import "../styles/homeStyle.css";
 import homeImage from '../assets/bg.jpg';
 // import { Button } from "react-bootstrap/Button";
 

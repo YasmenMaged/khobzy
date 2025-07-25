@@ -1,0 +1,25 @@
+.home-container {
+  display: flex;
+  align-items: center;
+  justify-content: right;
+  padding: 2rem;
+  background-color: #fdfaf4;
+  min-height: 100vh;
+  direction: rtl;
+  font-family: "Aref Ruqaa", serif;
+}
+ 
+.start-btn {
+    border: none;
+    background-color: #D9A321;
+    padding: 10px 20px;
+    border-radius: 20px;
+    color: #fff;
+    font-size: 25px;
+    margin-top: 20px;
+    font-weight: bold;
+}
+.start-btn:hover{
+    background-color:#c69113;
+}
+ 
