@@ -1,24 +1,28 @@
 .home-container {
-  display: flex;
-  align-items: center;
-  justify-content: right;
-  padding: 2rem;
-  background-color: #fdfaf4;
-  min-height: 100vh;
-  direction: rtl;
-  font-family: "Aref Ruqaa", serif;
+padding: 2rem;
+background-color: #fdfaf4;
+min-height: 100vh;
+direction: rtl;
 }
 
-.start-btn {
-    border: none;
-    background-color: #D9A321;
-    padding: 10px 20px;
-    border-radius: 20px;
-    color: #fff;
-    font-size: 25px;
-    margin-top: 20px;
-    font-weight: bold;
+.home-title {
+font-size: 2rem;
+font-weight: bold;
+color: #4b3f2f;
+margin-bottom: 1.5rem;
+text-align: center;
 }
-.start-btn:hover{
-    background-color:#c69113;
+
+.bakery-list {
+display: flex;
+flex-wrap: wrap;
+gap: 1.5rem;
+justify-content: center;
+}
+
+.home-no-bakeries {
+text-align: center;
+font-size: 1.2rem;
+color: #777;
+margin-top: 3rem;
 }
