@@ -3,9 +3,10 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
-import users from "../modules/mock_users.json";
+import mockUsers from "../modules/mock_users.json";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { addUser, getUser } from "../modules/registeredUsers";
 import "../styles/auth.css";
 
 const governoratesData = {
@@ -18,7 +19,7 @@ const governoratesData = {
   المنوفية: ["شبين الكوم", "منوف", "السادات", "أشمون", "سرس الليان"],
   الفيوم: ["الفيوم", "إطسا", "سنورس", "طامية", "أبشواي"],
   "بني سويف": ["بني سويف", "الواسطى", "ناصر", "الفشن", "ببا"],
-  المنيا: ["المنيا", "مطاي", "بني مزار", "ملوي", "أبو قرقاص"],
+  المنيا: ["المنيا", "مطاي", "بني مazar", "ملوي", "أبو قرقاص"],
   أسيوط: ["أسيوط", "ديروط", "القوصية", "أبوتيج", "منفلوط"],
   سوهاج: ["سوهاج", "طهطا", "جرجا", "المراغة", "البلينا"],
   قنا: ["قنا", "دشنا", "نجع حمادي", "قفط", "أبوتشت"],
@@ -51,7 +52,7 @@ const Signup = () => {
       password: Yup.string()
         .min(6, "كلمة السر يجب أن تكون 6 أحرف على الأقل")
         .matches(/[A-Z]/, "يجب أن تحتوي على حرف كبير واحد على الأقل")
-        .matches(/[!@#$%^&*(),.?":{}|<>]/, "يجب أن تحتوي على رمز خاص واحد على الأقل")
+        .matches(/[!@#$%^&*(),.?\":{}|<>]/, "يجب أن تحتوي على رمز خاص واحد على الأقل")
         .required("مطلوب"),
       phone: Yup.string()
         .matches(/^01[0125][0-9]{8}$/, "رقم الهاتف غير صالح")
@@ -64,21 +65,42 @@ const Signup = () => {
       const normalizedPhone = values.phone.trim();
       const normalizedNationalId = values.nationalId.trim();
 
-      const isCitizen = users?.citizens?.some(
-        (user) =>
-          user.phone?.trim() === normalizedPhone &&
-          user.national_id?.trim() === normalizedNationalId
+      // Check if user exists in mock_users.json
+      const existingUser = mockUsers.citizens.find(
+        (citizen) =>
+          citizen.phone === normalizedPhone &&
+          citizen.national_id === normalizedNationalId
       );
 
-      if (!isCitizen) {
-        toast.error("ليس لديك بطاقة تموينية", {
-          position: "top-right",
-        });
-        return;
-      }
+      if (existingUser) {
+        navigate("/");
+      } else {
+        // Prepare new user object with the exact password entered
+        const newUser = {
+          role: "citizen",
+          name: "New Citizen", // Placeholder, update as needed
+          national_id: normalizedNationalId,
+          phone: normalizedPhone,
+          password: values.password, // Use exact password entered
+          email: values.email,
+          governorate: values.governorate,
+          district: values.district,
+          village: values.village || "",
+        };
 
-      localStorage.setItem("userType", "citizen");
-      navigate("/");
+        // Add user to localStorage
+        const { success, message } = addUser(newUser);
+        if (success) {
+          const user = getUser(normalizedPhone, values.password);
+          if (user) {
+            navigate("/");
+          } else {
+            toast.error("فشل في التحقق من المستخدم بعد التسجيل");
+          }
+        } else {
+          toast.error(message);
+        }
+      }
     },
   });
 
@@ -223,7 +245,6 @@ const Signup = () => {
         </div>
       </div>
 
-      {/* Toast Container */}
       <ToastContainer />
     </div>
   );

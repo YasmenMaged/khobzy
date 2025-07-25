@@ -1,10 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
-import '../styles/navbar.css'; // Assuming you have a CSS file for styling
+import '../styles/navbar.css';
 
 const Navbar = () => {
-  const { userType } = useUser();
+  const { userType, isLoggedIn } = useUser();
 
   return (
     <nav className="navbar navbar-expand-lg fixed-top navbar-custom">
@@ -39,11 +39,20 @@ const Navbar = () => {
                 </Link>
               </li>
             )}
-            <li className="nav-item">
-              <Link className="nav-link" to="/choose-role">
-                تسجيل الدخول
-              </Link>
-            </li>
+            {!isLoggedIn && (
+              <li className="nav-item">
+                <Link className="nav-link" to="/choose-role">
+                  تسجيل الدخول
+                </Link>
+              </li>
+            )}
+            {isLoggedIn && (
+              <li className="nav-item">
+                <Link className="nav-link" to="/logout">
+                  تسجيل الخروج
+                </Link>
+              </li>
+            )}
           </ul>
         </div>
       </div>

@@ -5,10 +5,9 @@ import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { useUser } from "../context/UserContext";
 import mockUsers from "../modules/mock_users.json";
+import { addUser, getUser } from "../modules/registeredUsers";
 import "../styles/auth.css";
-
 
 const governoratesData = {
   القاهرة: ["المعادي", "مصر الجديدة", "مدينة نصر", "حلوان", "الساحل", "شبرا"],
@@ -20,7 +19,7 @@ const governoratesData = {
   المنوفية: ["شبين الكوم", "منوف", "السادات", "أشمون", "سرس الليان"],
   الفيوم: ["الفيوم", "إطسا", "سنورس", "طامية", "أبشواي"],
   "بني سويف": ["بني سويف", "الواسطى", "ناصر", "الفشن", "ببا"],
-  المنيا: ["المنيا", "مطاي", "بني مزار", "ملوي", "أبو قرقاص"],
+  المنيا: ["المنيا", "مطاي", "بني mazar", "ملوي", "أبو قرقاص"],
   أسيوط: ["أسيوط", "ديروط", "القوصية", "أبوتيج", "منفلوط"],
   سوهاج: ["سوهاج", "طهطا", "جرجا", "المراغة", "البلينا"],
   قنا: ["قنا", "دشنا", "نجع حمادي", "قفط", "أبوتشت"],
@@ -33,7 +32,6 @@ const governoratesData = {
 
 const BakerySignup = () => {
   const navigate = useNavigate();
-  const { setUserType } = useUser();
   const [districts, setDistricts] = useState([]);
 
   const formik = useFormik({
@@ -64,24 +62,45 @@ const BakerySignup = () => {
       village: Yup.string(),
     }),
     onSubmit: (values) => {
-      const baker = mockUsers.bakers.find(
+      const normalizedPhone = values.phone.trim();
+      const normalizedNationalId = values.nationalId.trim();
+
+      // Check if user exists in mock_users.json
+      const existingUser = mockUsers.bakers.find(
         (baker) =>
-          baker.national_id === values.nationalId && baker.phone === values.phone
+          baker.phone === normalizedPhone &&
+          baker.national_id === normalizedNationalId
       );
 
-      if (baker) {
-        setUserType("owner");
-        console.log("Form submitted:", values);
+      if (existingUser) {
         navigate("/");
       } else {
-        toast.error("ليس لديك مخبز", {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-        });
+        // Prepare new user object with the exact password entered
+        const newUser = {
+          role: "baker",
+          name: values.name,
+          national_id: normalizedNationalId,
+          phone: normalizedPhone,
+          password: values.password, // Use exact password entered
+          bakery_name: values.bakeryName,
+          governorate: values.governorate,
+          district: values.district,
+          village: values.village || "",
+          location: `${values.district}, ${values.governorate}`, // Simplified location
+        };
+
+        // Add user to localStorage
+        const { success, message } = addUser(newUser);
+        if (success) {
+          const user = getUser(normalizedPhone, values.password);
+          if (user) {
+            navigate("/");
+          } else {
+            toast.error("فشل في التحقق من المستخدم بعد التسجيل");
+          }
+        } else {
+          toast.error(message);
+        }
       }
     },
   });
@@ -251,12 +270,12 @@ const BakerySignup = () => {
             <button type="submit" className="btn w-100 mt-3" style={{ backgroundColor: "#E0B243", color: "#FFFFFF", fontSize: "18px" }}>
               تسجيل
             </button>
-                 <p className="mt-3 text-center">
-                لديك حساب بالفعل؟ {" "}
-                <a href="/login" style={{ color: "#E0B243", textDecoration: "underline" }}>
-                  تسجيل الدخول
-                </a>
-              </p>
+            <p className="mt-3 text-center">
+              لديك حساب بالفعل؟ {" "}
+              <a href="/login" style={{ color: "#E0B243", textDecoration: "underline" }}>
+                تسجيل الدخول
+              </a>
+            </p>
           </form>
         </div>
       </div>
@@ -277,7 +296,6 @@ const BakerySignup = () => {
         </div>
       </div>
 
-      {/* Toast Container */}
       <ToastContainer />
     </div>
   );

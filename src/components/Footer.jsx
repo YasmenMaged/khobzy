@@ -8,7 +8,8 @@ const Footer = () => (
       backgroundColor: "#4A2C2A",
       color: "white",
       textAlign: "center",
-      fontSize:'20px'
+      fontSize:'20px',
+      fontFamily: "Aref Ruqaa",
     }}
   >
     <p>© 2025 خبزك - جميع الحقوق محفوظة</p>

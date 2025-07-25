@@ -10,6 +10,7 @@ import Login from './pages/Login';
 import BakerySignup from './pages/BakerySignUp';
 import UserTypeSelection from './pages/UserTypeSelection';
 import { UserContextProvider } from './context/UserContext';
+import Logout from './pages/Logout';
 
 function AppContent() {
 const location = useLocation();
@@ -28,6 +29,7 @@ return (
 <Route path="/login" element={<Login />} />
 <Route path="/dashboard" element={<Dashboard />} />
 <Route path="/reservations" element={<Reservations />} />
+<Route path="/logout" element={<Logout />} />
 </Routes>
 {!hideNavFooter && <Footer />}
 </>

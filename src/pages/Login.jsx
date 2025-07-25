@@ -2,8 +2,10 @@ import React from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useNavigate, Link } from 'react-router-dom';
+import { getUser } from '../modules/registeredUsers';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import "../styles/auth.css";
-
 
 const Login = () => {
   const navigate = useNavigate();
@@ -22,9 +24,19 @@ const Login = () => {
         .required('مطلوب'),
     }),
     onSubmit: (values) => {
-      console.log(values);
-      alert('تم تسجيل الدخول بنجاح!');
-      navigate('/dashboard');
+      const { phone, password } = values;
+
+      // Check user in localStorage using getUser
+      const user = getUser(phone, password);
+
+      if (user) {
+        navigate('/');
+      } else {
+        toast.error('ليس لديك حساب، يرجى التسجيل أو تحقق من كلمة السر', {
+          position: 'top-right',
+          autoClose: 3000,
+        });
+      }
     },
   });
 
@@ -35,88 +47,99 @@ const Login = () => {
 
   return (
     <div
-      className="container-fluid"
-      style={{ minHeight: '100vh', display: 'flex', alignItems: 'center' }}
+      className="d-flex flex-column flex-md-row"
+      style={{ minHeight: '100vh', direction: 'rtl' }}
     >
-      <div className="row flex-grow-1 w-100">
-        
+      <div className="w-100 w-md-50 d-flex align-items-center justify-content-center p-3">
+        <div
+          className="w-100"
+          style={{
+            maxWidth: "500px",
+            padding: "20px",
+            backgroundColor: "#fff",
+            borderRadius: "8px",
+            boxShadow: "0 0 10px rgba(0,0,0,0.1)",
+            overflowY: "auto",
+            maxHeight: "90vh",
+          }}
+        >
+          <h2 className="text-center mb-4" style={{ color: '#4A2C2A', fontFamily: 'Aref Ruqaa' }}>
+            تسجيل الدخول
+          </h2>
 
-        <div className="col-md-6 d-flex align-items-center justify-content-center " dir="rtl">
-          <div className="p-4 shadow rounded w-100" style={{ maxWidth: '450px', backgroundColor: '#fff' }}>
-            <h2 className="text-center mb-4" style={{ color: '#4A2C2A' ,fontFamily: 'Aref Ruqaa'}}>
-              تسجيل الدخول
-            </h2>
+          <form onSubmit={formik.handleSubmit} noValidate>
+            <div className="mb-3">
+              <label htmlFor="phone" className="form-label" style={{ color: '#2E1C1A' }}>
+                رقم التليفون
+              </label>
+              <input
+                type="text"
+                id="phone"
+                name="phone"
+                className="form-control"
+                style={{ backgroundColor: '#E5E5E5' }}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                value={formik.values.phone}
+              />
+              {getFieldError('phone')}
+            </div>
 
-            <form onSubmit={formik.handleSubmit} noValidate>
-              <div className="mb-3">
-                <label htmlFor="phone" className="form-label" style={{ color: '#2E1C1A' }}>
-                  رقم التليفون
-                </label>
-                <input
-                  type="text"
-                  id="phone"
-                  name="phone"
-                  className="form-control"
-                  style={{ backgroundColor: '#E5E5E5' }}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  value={formik.values.phone}
-                />
-                {getFieldError('phone')}
-              </div>
+            <div className="mb-3">
+              <label htmlFor="password" className="form-label" style={{ color: '#2E1C1A' }}>
+                كلمة السر
+              </label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                className="form-control"
+                style={{ backgroundColor: '#E5E5E5' }}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                value={formik.values.password}
+              />
+              {getFieldError('password')}
+            </div>
 
-              <div className="mb-3">
-                <label htmlFor="password" className="form-label" style={{ color: '#2E1C1A' }}>
-                  كلمة السر
-                </label>
-                <input
-                  type="password"
-                  id="password"
-                  name="password"
-                  className="form-control"
-                  style={{ backgroundColor: '#E5E5E5' }}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  value={formik.values.password}
-                />
-                {getFieldError('password')}
-              </div>
+            <button
+              type="submit"
+              className="btn w-100 mt-3"
+              style={{
+                backgroundColor: '#E0B243',
+                color: '#FFFFFF',
+                fontSize: '18px',
+              }}
+            >
+              دخول
+            </button>
 
-              <button
-                type="submit"
-                className="btn w-100"
-                style={{
-                  backgroundColor: '#E0B243',
-                  color: '#FFFFFF',
-                  fontSize: '18px',
-                }}
-              >
-                دخول
-              </button>
-
-              <p className="mt-3 text-center">
-                ليس لديك حساب؟{' '}
-                <Link to="/signup" style={{ color: '#E0B243', textDecoration: 'underline' }}>
-                  إنشاء حساب
-                </Link>
-              </p>
-            </form>
-          </div>
+            <p className="mt-3 text-center">
+              ليس لديك حساب؟{' '}
+              <Link to="/signup" style={{ color: '#E0B243', textDecoration: 'underline' }}>
+                إنشاء حساب
+              </Link>
+            </p>
+          </form>
         </div>
+      </div>
 
-        <div className="col-md-6 d-none d-md-block p-0">
+      <div className="w-100 w-md-50 d-flex align-items-center justify-content-center p-3">
+        <div style={{ maxHeight: "90vh", overflow: "hidden" }}>
           <img
             src={require('../assets/login1.avif')}
             alt="bread"
             style={{
               width: '100%',
-              height: '100%',
-              maxHeight: '100vh',
-              objectFit: 'contain',
+              height: 'auto',
+              maxHeight: '90vh',
+              objectFit: 'cover',
             }}
           />
         </div>
       </div>
+
+      <ToastContainer />
     </div>
   );
 };
