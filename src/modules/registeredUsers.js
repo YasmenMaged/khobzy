@@ -4,7 +4,7 @@ const STORAGE_KEY = "users";
  
 // Helper: Get all users from localStorage
 
-function getAllUsers() {
+export function getAllUsers() {
 
   const users = localStorage.getItem(STORAGE_KEY);
 
