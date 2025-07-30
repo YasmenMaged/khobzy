@@ -4,8 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useSpring, animated } from 'react-spring';
-import mockUsers from "../modules/mock_users.json";
-import { addUser } from "../modules/registeredUsers";
+import { db } from '../services/firebase'; // Import Firestore
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 
 // Add FontAwesome CDN
 const fontAwesomeLink = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css";
@@ -17,38 +17,33 @@ const Profile = () => {
   const [editedData, setEditedData] = useState({});
   const navigate = useNavigate();
 
+  // Fetch user data from Firestore on mount
   useEffect(() => {
-    if (userData && userData.role === 'citizen') {
-      const matchingUser = mockUsers.citizens.find(
-        (citizen) =>
-          citizen.phone === userData.phone &&
-          citizen.national_id === userData.national_id
-      );
-      if (matchingUser) {
-        setAdditionalData({
-          family_members: matchingUser.family_members || "غير محدد",
-          monthly_bread_quota: matchingUser.monthly_bread_quota || "غير محدد",
-          available_bread_per_day: matchingUser.available_bread_per_day || "غير محدد",
-          available_bread: matchingUser.available_bread || "غير محدد",
-        });
+    const fetchUserData = async () => {
+      if (userData && userData.phone) {
+        const userRef = doc(db, "users", userData.phone);
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists()) {
+          setUserData(userSnap.data());
+        }
       }
-    }
-  }, [userData]);
+    };
+    fetchUserData();
+  }, [userData?.phone, setUserData]);
 
   const handleEdit = () => {
     setEditMode(true);
     setEditedData({ ...userData });
   };
 
-  const handleSave = () => {
-    // Update only via localStorage using addUser
-    const { success } = addUser({ ...userData, ...editedData });
-    if (success) {
-      // Reset to original view after save
+  const handleSave = async () => {
+    if (userData && userData.phone) {
+      const userRef = doc(db, "users", userData.phone);
+      await setDoc(userRef, { ...userData, ...editedData }, { merge: true });
       setEditMode(false);
-      setEditedData({}); // Clear editedData to avoid showing it
-      setUserData({ ...userData, ...editedData }); // Update userData with new values
-      toast.success("تم حفظ التعديل بنجاح", {
+      setEditedData({});
+      setUserData({ ...userData, ...editedData });
+      toast.success("تم تحديث البيانات بنجاح", {
         position: "top-right",
         autoClose: 2000,
       });

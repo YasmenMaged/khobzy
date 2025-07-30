@@ -1,17 +1,17 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
-import Signup from './pages/Signup';
-import Home from './pages/Home';
-import Dashboard from './pages/Dashboard';
-import Navbar from './components/Navbar';
-import Footer from './components/Footer';
-import Reservations from './pages/Reservations';
-import Login from './pages/Login';
-import BakerySignup from './pages/BakerySignUp';
-import UserTypeSelection from './pages/UserTypeSelection';
-import { UserContextProvider } from './context/UserContext';
-import Logout from './pages/Logout';
-import Profile from './pages/Profile';
+import Signup from './pages/Signup.jsx';
+import Home from './pages/Home.jsx';
+import Dashboard from './pages/Dashboard.jsx';
+import Navbar from './components/Navbar.jsx';
+import Footer from './components/Footer.jsx';
+import Reservations from './pages/Reservations.jsx';
+import Login from './pages/Login.jsx';
+import BakerySignup from './pages/BakerySignUp.jsx';
+import UserTypeSelection from './pages/UserTypeSelection.jsx';
+import { UserContextProvider } from './context/UserContext.js';
+import Logout from './pages/Logout.jsx';
+import Profile from './pages/Profile.jsx';
 
 function AppContent() {
 const location = useLocation();
