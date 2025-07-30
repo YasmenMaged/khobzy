@@ -6,6 +6,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import mockUsers from "../modules/mock_users.json";
+import { UserContext } from "../context/UserContext";
 import { addUser, getUser } from "../modules/registeredUsers";
 import "../styles/auth.css";
 
@@ -64,43 +65,52 @@ const BakerySignup = () => {
     onSubmit: (values) => {
       const normalizedPhone = values.phone.trim();
       const normalizedNationalId = values.nationalId.trim();
+      const normalizedPassword = values.password.trim();
 
       // Check if user exists in mock_users.json
-      const existingUser = mockUsers.bakers.find(
+      const existingUserInMock = mockUsers.bakers.find(
         (baker) =>
           baker.phone === normalizedPhone &&
           baker.national_id === normalizedNationalId
       );
 
-      if (existingUser) {
-        navigate("/");
-      } else {
-        // Prepare new user object with the exact password entered
-        const newUser = {
-          role: "baker",
-          name: values.name,
-          national_id: normalizedNationalId,
-          phone: normalizedPhone,
-          password: values.password, // Use exact password entered
-          bakery_name: values.bakeryName,
-          governorate: values.governorate,
-          district: values.district,
-          village: values.village || "",
-          location: `${values.district}, ${values.governorate}`, // Simplified location
-        };
-
-        // Add user to localStorage
-        const { success, message } = addUser(newUser);
-        if (success) {
-          const user = getUser(normalizedPhone, values.password);
-          if (user) {
+      if (existingUserInMock) {
+        // Check if user is already registered in localStorage
+        const existingUserInStorage = getUser(normalizedPhone, normalizedPassword);
+        if (existingUserInStorage) {
+          console.log("User already registered in localStorage:", existingUserInStorage);
+          toast.info("لديك حساب بالفعل", {
+            position: "top-right",
+            autoClose: 2000, // Display for 2 seconds
+          });
+          setTimeout(() => {
+            navigate("/login");
+          }, 2500); // Navigate after 2.5 seconds to ensure toast is visible
+        } else {
+          // Add user to localStorage if not registered
+          const newUser = {
+            role: "baker",
+            name: values.name,
+            national_id: normalizedNationalId,
+            phone: normalizedPhone,
+            password: normalizedPassword,
+            bakery_name: values.bakeryName,
+            governorate: values.governorate,
+            district: values.district,
+            village: values.village || "",
+            location: `${values.district}, ${values.governorate}`, // Simplified location
+          };
+          const { success, message } = addUser(newUser);
+          if (success) {
+            console.log("User added to localStorage:", newUser);
             navigate("/");
           } else {
-            toast.error("فشل في التحقق من المستخدم بعد التسجيل");
+            toast.error(message);
           }
-        } else {
-          toast.error(message);
         }
+      } else {
+        // User not found in mock_users.json
+        toast.error("ليس لديك بطاقة");
       }
     },
   });
@@ -271,7 +281,7 @@ const BakerySignup = () => {
               تسجيل
             </button>
             <p className="mt-3 text-center">
-              لديك حساب بالفعل؟ {" "}
+              لديك حساب بالفعل? {" "}
               <a href="/login" style={{ color: "#E0B243", textDecoration: "underline" }}>
                 تسجيل الدخول
               </a>

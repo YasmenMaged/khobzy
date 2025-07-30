@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
@@ -7,6 +7,8 @@ import mockUsers from "../modules/mock_users.json";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { addUser, getUser } from "../modules/registeredUsers";
+import { UserContext } from "../context/UserContext";
+import { useUser } from '../context/UserContext';
 import "../styles/auth.css";
 
 const governoratesData = {
@@ -19,7 +21,7 @@ const governoratesData = {
   المنوفية: ["شبين الكوم", "منوف", "السادات", "أشمون", "سرس الليان"],
   الفيوم: ["الفيوم", "إطسا", "سنورس", "طامية", "أبشواي"],
   "بني سويف": ["بني سويف", "الواسطى", "ناصر", "الفشن", "ببا"],
-  المنيا: ["المنيا", "مطاي", "بني مazar", "ملوي", "أبو قرقاص"],
+  المنيا: ["المنيا", "مطاي", "بني mazar", "ملوي", "أبو قرقاص"],
   أسيوط: ["أسيوط", "ديروط", "القوصية", "أبوتيج", "منفلوط"],
   سوهاج: ["سوهاج", "طهطا", "جرجا", "المراغة", "البلينا"],
   قنا: ["قنا", "دشنا", "نجع حمادي", "قفط", "أبوتشت"],
@@ -33,6 +35,7 @@ const governoratesData = {
 const Signup = () => {
   const [districts, setDistricts] = useState([]);
   const navigate = useNavigate();
+  const { setUserData } = useContext(UserContext);
 
   const formik = useFormik({
     initialValues: {
@@ -64,42 +67,53 @@ const Signup = () => {
     onSubmit: (values) => {
       const normalizedPhone = values.phone.trim();
       const normalizedNationalId = values.nationalId.trim();
+      const normalizedPassword = values.password.trim();
 
       // Check if user exists in mock_users.json
-      const existingUser = mockUsers.citizens.find(
+      const existingUserInMock = mockUsers.citizens.find(
         (citizen) =>
           citizen.phone === normalizedPhone &&
           citizen.national_id === normalizedNationalId
       );
 
-      if (existingUser) {
-        navigate("/");
-      } else {
-        // Prepare new user object with the exact password entered
-        const newUser = {
-          role: "citizen",
-          name: "New Citizen", // Placeholder, update as needed
-          national_id: normalizedNationalId,
-          phone: normalizedPhone,
-          password: values.password, // Use exact password entered
-          email: values.email,
-          governorate: values.governorate,
-          district: values.district,
-          village: values.village || "",
-        };
-
-        // Add user to localStorage
-        const { success, message } = addUser(newUser);
-        if (success) {
-          const user = getUser(normalizedPhone, values.password);
-          if (user) {
+      if (existingUserInMock) {
+        // Check if user is already registered in localStorage
+        const existingUserInStorage = getUser(normalizedPhone, normalizedPassword);
+        if (existingUserInStorage) {
+          console.log("User already registered in localStorage:", existingUserInStorage);
+          toast.info("لديك حساب بالفعل", {
+            position: "top-right",
+            autoClose: 2000, // Display for 2 seconds
+          });
+          setTimeout(() => {
+            navigate("/login");
+          }, 2500); // Navigate after 2.5 seconds to ensure toast is visible
+        } else {
+          // Add user to localStorage if not registered
+          const newUser = {
+            role: "citizen",
+            name: existingUserInMock.name || "New Citizen", // Use name from mock if available
+            national_id: normalizedNationalId,
+            phone: normalizedPhone,
+            password: normalizedPassword,
+            email: values.email,
+            governorate: values.governorate,
+            district: values.district,
+            village: values.village || "",
+          };
+          const { success, message } = addUser(newUser);
+          if (success) {
+            console.log("User added to localStorage:", newUser);
+            // Set user data in context
+            setUserData(newUser);
             navigate("/");
           } else {
-            toast.error("فشل في التحقق من المستخدم بعد التسجيل");
+            toast.error(message);
           }
-        } else {
-          toast.error(message);
         }
+      } else {
+        // User not found in mock_users.json
+        toast.error("ليس لديك بطاقة");
       }
     },
   });
@@ -220,7 +234,7 @@ const Signup = () => {
               تسجيل
             </button>
             <p className="mt-3 text-center">
-              لديك حساب بالفعل؟ {" "}
+              لديك حساب بالفعل? {" "}
               <a href="/login" style={{ color: "#E0B243", textDecoration: "underline" }}>
                 تسجيل الدخول
               </a>

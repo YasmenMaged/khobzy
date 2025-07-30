@@ -1,7 +1,7 @@
 import React, { createContext, useState, useContext } from 'react';
 
 // Create the UserContext
-const UserContext = createContext();
+export const UserContext = createContext();
 
 // Create a provider component
 export const UserContextProvider = ({ children }) => {
@@ -19,4 +19,4 @@ export const UserContextProvider = ({ children }) => {
 // Custom hook to use the UserContext
 export const useUser = () => useContext(UserContext);
 
-export default UserContext;
+//export default UserContext;

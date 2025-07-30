@@ -22,4 +22,51 @@
 .start-btn:hover{
     background-color:#c69113;
 }
- 
+ .grid {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.infographic-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+@media (min-width: 768px) {
+  .infographic-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.infographic-card {
+  text-align: center;
+  border-radius: 10px;
+  transition: transform 0.3s ease;
+}
+.infographic-card:hover {
+  transform: scale(1.05);
+}
+.progress-container {
+  text-align: center;
+  margin-top: 10px;
+}
+.progress-bar-wrapper {
+  width: 100%;
+  height: 20px;
+  background-color: #f0f0f0;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.progress-bar {
+  height: 100%;
+  border-radius: 10px;
+  text-align: right;
+  color: white;
+  padding-right: 10px;
+}
+.space-y-4 > * + * {
+  margin-top: 1rem;
+}

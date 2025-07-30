@@ -1,14 +1,18 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useNavigate, Link } from 'react-router-dom';
 import { getUser } from '../modules/registeredUsers';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { UserContext } from '../context/UserContext';
+import { useUser } from '../context/UserContext';
+import mockUsers from '../modules/mock_users.json';
 import "../styles/auth.css";
 
 const Login = () => {
   const navigate = useNavigate();
+  const { setUserData } = useContext(UserContext);
 
   const formik = useFormik({
     initialValues: {
@@ -25,11 +29,33 @@ const Login = () => {
     }),
     onSubmit: (values) => {
       const { phone, password } = values;
+      const normalizedPhone = phone.trim();
+      const normalizedPassword = password.trim();
 
       // Check user in localStorage using getUser
-      const user = getUser(phone, password);
+      const user = getUser(normalizedPhone, normalizedPassword);
 
       if (user) {
+        // Fetch additional data from mock_users.json if available
+        let fullUserData = { ...user };
+        if (user.role === 'citizen') {
+          const matchingUser = mockUsers.citizens.find(
+            (citizen) => citizen.phone === normalizedPhone && citizen.national_id === user.national_id
+          );
+          if (matchingUser) {
+            fullUserData = { ...fullUserData, ...matchingUser };
+          }
+        } else if (user.role === 'baker') {
+          const matchingUser = mockUsers.bakers.find(
+            (baker) => baker.phone === normalizedPhone && baker.national_id === user.national_id
+          );
+          if (matchingUser) {
+            fullUserData = { ...fullUserData, ...matchingUser };
+          }
+        }
+
+        // Set user data in context
+        setUserData(fullUserData);
         navigate('/');
       } else {
         toast.error('ليس لديك حساب، يرجى التسجيل أو تحقق من كلمة السر', {
