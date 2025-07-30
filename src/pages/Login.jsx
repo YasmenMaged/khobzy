@@ -12,7 +12,7 @@ import "../styles/auth.css";
 
 const Login = () => {
   const navigate = useNavigate();
-  const { setUserData } = useContext(UserContext);
+  const { setUserData, setIsLoggedIn } = useUser();
 
   const formik = useFormik({
     initialValues: {
@@ -54,8 +54,9 @@ const Login = () => {
           }
         }
 
-        // Set user data in context
+        // Set user data and login state in context
         setUserData(fullUserData);
+        setIsLoggedIn(true);
         navigate('/');
       } else {
         toast.error('ليس لديك حساب، يرجى التسجيل أو تحقق من كلمة السر', {

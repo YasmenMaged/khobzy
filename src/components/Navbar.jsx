@@ -9,9 +9,16 @@ const Navbar = () => {
   return (
     <nav className="navbar navbar-expand-lg fixed-top navbar-custom">
       <div className="container-fluid">
+        {isLoggedIn &&   
+                   <Link to="/profile">
+                         <i class="fa-solid fa-circle-user fa-xl" style={{color:'#D99A2B'}}></i> 
+                   </Link>
+                
+        }
         <Link className="navbar-brand fs-4" to="/" style={{ fontWeight: 'bold' }}>
           خبزي
         </Link>
+        
 
         <button
           className="navbar-toggler"
@@ -40,18 +47,29 @@ const Navbar = () => {
               </li>
             )}
             {!isLoggedIn && (
-              <li className="nav-item">
-                <Link className="nav-link" to="/choose-role">
-                  تسجيل الدخول
-                </Link>
-              </li>
+              <>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/signup">
+                    إنشاء حساب
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/login">
+                    تسجيل الدخول
+                  </Link>
+                </li>
+              </>
             )}
             {isLoggedIn && (
-              <li className="nav-item">
-                <Link className="nav-link" to="/logout">
-                  تسجيل الخروج
-                </Link>
-              </li>
+              <>
+              
+                <li className="nav-item">
+                  <Link className="nav-link" to="/logout">
+                    تسجيل الخروج
+                  </Link>
+                </li>
+                
+              </>
             )}
           </ul>
         </div>

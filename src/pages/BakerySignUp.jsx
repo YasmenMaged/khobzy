@@ -8,6 +8,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import mockUsers from "../modules/mock_users.json";
 import { UserContext } from "../context/UserContext";
 import { addUser, getUser } from "../modules/registeredUsers";
+import { useUser } from "../context/UserContext";
 import "../styles/auth.css";
 
 const governoratesData = {
@@ -34,6 +35,7 @@ const governoratesData = {
 const BakerySignup = () => {
   const navigate = useNavigate();
   const [districts, setDistricts] = useState([]);
+  const { setUserData, setIsLoggedIn } = useUser();
 
   const formik = useFormik({
     initialValues: {
@@ -103,6 +105,9 @@ const BakerySignup = () => {
           const { success, message } = addUser(newUser);
           if (success) {
             console.log("User added to localStorage:", newUser);
+            // Set user data and login state in context
+            setUserData(newUser);
+            setIsLoggedIn(true);
             navigate("/");
           } else {
             toast.error(message);

@@ -3,7 +3,7 @@ import { useUser } from '../context/UserContext';
 import "../styles/homeStyle.css";
 import homeImage from '../assets/back.jpg';
 import mockUsers from "../modules/mock_users.json";
-import { useSpring, animated } from 'react-spring'; // Import react-spring for animations
+import { useSpring, animated } from 'react-spring';
 
 // Add FontAwesome CDN
 const fontAwesomeLink = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css";
@@ -70,54 +70,6 @@ const HomePage = () => {
           </div>
         </header>
       </div>
-
-      {userData && (
-        <section className="user-data-section p-4" style={{ backgroundColor: '#F9F5F1', paddingTop: '40px' }}>
-          <div className="user-data-content p-5 my-5 mx-auto" style={{
-            background: 'linear-gradient(135deg, #ffffff 0%, #f8ece4 100%)',
-            borderRadius: '15px',
-            boxShadow: '0 8px 20px rgba(0,0,0,0.15)',
-            maxWidth: '700px',
-            border: '1px solid #e0b24333',
-          }}>
-            <h2 className="text-center mb-5" style={{ color: '#4A2C2A', fontFamily: 'Aref Ruqaa', fontSize: '2.5rem' }}>
-              <i className="fas fa-user" style={{ marginRight: '10px', color: '#E0B243' }}></i>
-              مرحباً، {userData.name}!
-            </h2>
-            <div className="user-details grid grid-cols-1 md:grid-cols-2 gap-4">
-              {userData.role === 'citizen' && (
-                <>
-                  <div className="p-3 bg-white rounded-lg shadow-md">
-                    <p style={{ fontSize: '1.2rem' }}><i className="fas fa-id-card" style={{ marginRight: '10px', color: '#4A2C2A' }}></i><strong>الرقم القومي:</strong> {userData.national_id}</p>
-                    <p style={{ fontSize: '1.2rem' }}><i className="fas fa-phone" style={{ marginRight: '10px', color: '#4A2C2A' }}></i><strong>رقم الهاتف:</strong> {userData.phone}</p>
-                    <p style={{ fontSize: '1.2rem' }}><i className="fas fa-envelope" style={{ marginRight: '10px', color: '#4A2C2A' }}></i><strong>البريد الإلكتروني:</strong> {userData.email || "غير محدد"}</p>
-                  </div>
-                  <div className="p-3 bg-white rounded-lg shadow-md">
-                    <p style={{ fontSize: '1.2rem' }}><i className="fas fa-map-marker-alt" style={{ marginRight: '10px', color: '#4A2C2A' }}></i><strong>المحافظة:</strong> {userData.governorate}</p>
-                    <p style={{ fontSize: '1.2rem' }}><i className="fas fa-map" style={{ marginRight: '10px', color: '#4A2C2A' }}></i><strong>المركز:</strong> {userData.district}</p>
-                    <p style={{ fontSize: '1.2rem' }}><i className="fas fa-home" style={{ marginRight: '10px', color: '#4A2C2A' }}></i><strong>القرية:</strong> {userData.village || "غير محدد"}</p>
-                  </div>
-                </>
-              )}
-              {userData.role === 'baker' && (
-                <>
-                  <div className="p-3 bg-white rounded-lg shadow-md">
-                    <p style={{ fontSize: '1.2rem' }}><i className="fas fa-id-card" style={{ marginRight: '10px', color: '#4A2C2A' }}></i><strong>الرقم القومي:</strong> {userData.national_id}</p>
-                    <p style={{ fontSize: '1.2rem' }}><i className="fas fa-phone" style={{ marginRight: '10px', color: '#4A2C2A' }}></i><strong>رقم الهاتف:</strong> {userData.phone}</p>
-                    <p style={{ fontSize: '1.2rem' }}><i className="fas fa-shop" style={{ marginRight: '10px', color: '#4A2C2A' }}></i><strong>اسم المخبز:</strong> {userData.bakery_name}</p>
-                  </div>
-                  <div className="p-3 bg-white rounded-lg shadow-md">
-                    <p style={{ fontSize: '1.2rem' }}><i className="fas fa-map-marker-alt" style={{ marginRight: '10px', color: '#4A2C2A' }}></i><strong>الموقع:</strong> {userData.location}</p>
-                    <p style={{ fontSize: '1.2rem' }}><i className="fas fa-map" style={{ marginRight: '10px', color: '#4A2C2A' }}></i><strong>المحافظة:</strong> {userData.governorate}</p>
-                    <p style={{ fontSize: '1.2rem' }}><i className="fas fa-map" style={{ marginRight: '10px', color: '#4A2C2A' }}></i><strong>المركز:</strong> {userData.district}</p>
-                    <p style={{ fontSize: '1.2rem' }}><i className="fas fa-home" style={{ marginRight: '10px', color: '#4A2C2A' }}></i><strong>القرية:</strong> {userData.village || "غير محدد"}</p>
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-        </section>
-      )}
 
       {userData && userData.role === 'citizen' && additionalData && (
         <section className="additional-data-section p-4" style={{ backgroundColor: '#F9F5F1', paddingBottom: '40px' }}>

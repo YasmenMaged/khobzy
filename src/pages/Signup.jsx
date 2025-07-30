@@ -35,7 +35,7 @@ const governoratesData = {
 const Signup = () => {
   const [districts, setDistricts] = useState([]);
   const navigate = useNavigate();
-  const { setUserData } = useContext(UserContext);
+  const { setUserData, setIsLoggedIn } = useUser();
 
   const formik = useFormik({
     initialValues: {
@@ -104,8 +104,9 @@ const Signup = () => {
           const { success, message } = addUser(newUser);
           if (success) {
             console.log("User added to localStorage:", newUser);
-            // Set user data in context
+            // Set user data and login state in context
             setUserData(newUser);
+            setIsLoggedIn(true);
             navigate("/");
           } else {
             toast.error(message);

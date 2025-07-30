@@ -11,6 +11,7 @@ import BakerySignup from './pages/BakerySignUp';
 import UserTypeSelection from './pages/UserTypeSelection';
 import { UserContextProvider } from './context/UserContext';
 import Logout from './pages/Logout';
+import Profile from './pages/Profile';
 
 function AppContent() {
 const location = useLocation();
@@ -30,6 +31,7 @@ return (
 <Route path="/dashboard" element={<Dashboard />} />
 <Route path="/reservations" element={<Reservations />} />
 <Route path="/logout" element={<Logout />} />
+<Route path="/profile" element={<Profile />} />
 </Routes>
 {!hideNavFooter && <Footer />}
 </>
