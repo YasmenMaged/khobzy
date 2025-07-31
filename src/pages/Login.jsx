@@ -1,18 +1,15 @@
-import React, { useContext } from 'react';
-import { useFormik } from 'formik';
-import * as Yup from 'yup';
-import { useNavigate, Link } from 'react-router-dom';
-import { getUser } from '../modules/registeredUsers';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { UserContext } from '../context/UserContext';
-import { useUser } from '../context/UserContext';
-import mockUsers from '../modules/mock_users.json';
-import "../styles/auth.css";
+import React from "react";
+import { useFormik } from "formik";
+import * as Yup from "yup";
+import { useNavigate, Link } from "react-router-dom";
+import { getUser } from "../modules/registeredUsers.js";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useUser } from "../context/UserContext";
 
 const Login = () => {
   const navigate = useNavigate();
-  const { setUserData, setIsLoggedIn } = useUser();
+  const { setUserData, setIsLoggedIn, setUserType } = useUser();
 
   const formik = useFormik({
     initialValues: {
@@ -27,36 +24,18 @@ const Login = () => {
         .min(6, 'كلمة السر يجب أن تكون 6 أحرف على الأقل')
         .required('مطلوب'),
     }),
-    onSubmit: (values) => {
+    onSubmit: async (values) => {
       const { phone, password } = values;
       const normalizedPhone = phone.trim();
       const normalizedPassword = password.trim();
 
-      // Check user in localStorage using getUser
-      const user = getUser(normalizedPhone, normalizedPassword);
-
+      const user = await getUser(normalizedPhone, normalizedPassword);
+      console.log("Fetched user:", user); // لتسجيل النتيجة
       if (user) {
-        // Fetch additional data from mock_users.json if available
-        let fullUserData = { ...user };
-        if (user.role === 'citizen') {
-          const matchingUser = mockUsers.citizens.find(
-            (citizen) => citizen.phone === normalizedPhone && citizen.national_id === user.national_id
-          );
-          if (matchingUser) {
-            fullUserData = { ...fullUserData, ...matchingUser };
-          }
-        } else if (user.role === 'baker') {
-          const matchingUser = mockUsers.bakers.find(
-            (baker) => baker.phone === normalizedPhone && baker.national_id === user.national_id
-          );
-          if (matchingUser) {
-            fullUserData = { ...fullUserData, ...matchingUser };
-          }
-        }
-
-        // Set user data and login state in context
-        setUserData(fullUserData);
+        const updatedUserType = user.role === 'baker' ? 'owner' : user.role;
+        setUserData(user);
         setIsLoggedIn(true);
+        setUserType(updatedUserType);
         navigate('/');
       } else {
         toast.error('ليس لديك حساب، يرجى التسجيل أو تحقق من كلمة السر', {
@@ -93,7 +72,6 @@ const Login = () => {
           <h2 className="text-center mb-4" style={{ color: '#4A2C2A', fontFamily: 'Aref Ruqaa' }}>
             تسجيل الدخول
           </h2>
-
           <form onSubmit={formik.handleSubmit} noValidate>
             <div className="mb-3">
               <label htmlFor="phone" className="form-label" style={{ color: '#2E1C1A' }}>
@@ -111,7 +89,6 @@ const Login = () => {
               />
               {getFieldError('phone')}
             </div>
-
             <div className="mb-3">
               <label htmlFor="password" className="form-label" style={{ color: '#2E1C1A' }}>
                 كلمة السر
@@ -128,7 +105,6 @@ const Login = () => {
               />
               {getFieldError('password')}
             </div>
-
             <button
               type="submit"
               className="btn w-100 mt-3"
@@ -140,17 +116,15 @@ const Login = () => {
             >
               دخول
             </button>
-
             <p className="mt-3 text-center">
               ليس لديك حساب؟{' '}
-              <Link to="/signup" style={{ color: '#E0B243', textDecoration: 'underline' }}>
+              <Link to="/choose-role" style={{ color: '#E0B243', textDecoration: 'underline' }}>
                 إنشاء حساب
               </Link>
             </p>
           </form>
         </div>
       </div>
-
       <div className="w-100 w-md-50 d-flex align-items-center justify-content-center p-3">
         <div style={{ maxHeight: "90vh", overflow: "hidden" }}>
           <img
@@ -165,7 +139,6 @@ const Login = () => {
           />
         </div>
       </div>
-
       <ToastContainer />
     </div>
   );

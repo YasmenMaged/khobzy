@@ -4,10 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useSpring, animated } from 'react-spring';
-import { db } from '../services/firebase'; // Import Firestore
+import { db } from '../services/firebase.js'; // استيراد Firestore من firebase.js
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 
-// Add FontAwesome CDN
 const fontAwesomeLink = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css";
 
 const Profile = () => {
@@ -17,7 +16,6 @@ const Profile = () => {
   const [editedData, setEditedData] = useState({});
   const navigate = useNavigate();
 
-  // Fetch user data from Firestore on mount
   useEffect(() => {
     const fetchUserData = async () => {
       if (userData && userData.phone) {
@@ -25,6 +23,7 @@ const Profile = () => {
         const userSnap = await getDoc(userRef);
         if (userSnap.exists()) {
           setUserData(userSnap.data());
+          setAdditionalData(userSnap.data());
         }
       }
     };
@@ -54,7 +53,6 @@ const Profile = () => {
     navigate('/logout');
   };
 
-  // Animation for user details
   const springProps = useSpring({
     from: { opacity: 0, transform: 'translateY(50px)' },
     to: { opacity: 1, transform: 'translateY(0px)' },
@@ -63,9 +61,7 @@ const Profile = () => {
 
   return (
     <>
-      {/* FontAwesome CDN Link */}
       <link rel="stylesheet" href={fontAwesomeLink} />
-
       <div className="profile-container" style={{ backgroundColor: '#F9F5F1', minHeight: '100vh', padding: '40px 0' }}>
         <div className="profile-content p-5 my-5 mx-auto" style={{
           background: 'linear-gradient(135deg, #ffffff 0%, #f8ece4 100%)',

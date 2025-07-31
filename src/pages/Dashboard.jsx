@@ -2,29 +2,43 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import mockUsers from '../modules/mock_users.json';
 import { getAllUsers } from '../modules/registeredUsers';
+import { useUser } from '../context/UserContext';
 import '../styles/dashboard.css';
 import '../styles/auth.css';
 
 const Dashboard = () => {
+  const { userType } = useUser();
   const [users, setUsers] = useState([]);
   const location = useLocation();
   const navigate = useNavigate();
   const [newOrdersCount, setNewOrdersCount] = useState(3);
 
   useEffect(() => {
-    const registeredUsers = getAllUsers();
-    const allUsers = [
-      ...mockUsers.citizens,
-      ...mockUsers.bakers,
-      ...registeredUsers,
-    ];
-    setUsers(allUsers);
-  }, []);
+    // التحقق من نوع المستخدم عند التحميل
+    if (userType !== 'owner') {
+      navigate('/');
+      return;
+    }
+
+    const fetchUsers = async () => {
+      try {
+        const registeredUsers = await getAllUsers(); // افتراض أنها async
+        const allUsers = [
+          ...mockUsers.citizens,
+          ...mockUsers.bakers,
+          ...(Array.isArray(registeredUsers) ? registeredUsers : []), // التحقق من أنها مصفوفة
+        ];
+        setUsers(allUsers);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+        setUsers([...mockUsers.citizens, ...mockUsers.bakers]); // استخدام البيانات المحلية كبديل
+      }
+    };
+    fetchUsers();
+  }, [userType, navigate]);
 
   const handleLogout = () => {
-    // مسح بيانات الجلسة (مثال)
     localStorage.removeItem('userToken'); // افتراضي، قم بتعديله حسب تخزينك
-    // توجيه إلى صفحة تسجيل الدخول
     navigate('/login');
   };
 

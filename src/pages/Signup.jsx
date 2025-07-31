@@ -1,13 +1,11 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
-import mockUsers from "../modules/mock_users.json";
+import { addUser, getUser } from "../modules/registeredUsers.js";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { addUser, getUser } from "../modules/registeredUsers";
-import { UserContext } from "../context/UserContext";
 import { useUser } from '../context/UserContext';
 import "../styles/auth.css";
 
@@ -64,57 +62,38 @@ const Signup = () => {
       district: Yup.string().required("مطلوب"),
       village: Yup.string(),
     }),
-    onSubmit: (values) => {
+    onSubmit: async (values) => {
       const normalizedPhone = values.phone.trim();
       const normalizedNationalId = values.nationalId.trim();
       const normalizedPassword = values.password.trim();
 
-      // Check if user exists in mock_users.json
-      const existingUserInMock = mockUsers.citizens.find(
-        (citizen) =>
-          citizen.phone === normalizedPhone &&
-          citizen.national_id === normalizedNationalId
-      );
-
-      if (existingUserInMock) {
-        // Check if user is already registered in localStorage
-        const existingUserInStorage = getUser(normalizedPhone, normalizedPassword);
-        if (existingUserInStorage) {
-          console.log("User already registered in localStorage:", existingUserInStorage);
-          toast.info("لديك حساب بالفعل", {
-            position: "top-right",
-            autoClose: 2000, // Display for 2 seconds
-          });
-          setTimeout(() => {
-            navigate("/login");
-          }, 2500); // Navigate after 2.5 seconds to ensure toast is visible
-        } else {
-          // Add user to localStorage if not registered
-          const newUser = {
-            role: "citizen",
-            name: existingUserInMock.name || "New Citizen", // Use name from mock if available
-            national_id: normalizedNationalId,
-            phone: normalizedPhone,
-            password: normalizedPassword,
-            email: values.email,
-            governorate: values.governorate,
-            district: values.district,
-            village: values.village || "",
-          };
-          const { success, message } = addUser(newUser);
-          if (success) {
-            console.log("User added to localStorage:", newUser);
-            // Set user data and login state in context
-            setUserData(newUser);
-            setIsLoggedIn(true);
-            navigate("/");
-          } else {
-            toast.error(message);
-          }
-        }
+      const existingUser = await getUser(normalizedPhone, normalizedPassword);
+      if (existingUser) {
+        toast.info("لديك حساب بالفعل", {
+          position: "top-right",
+          autoClose: 2000,
+        });
+        setTimeout(() => navigate("/login"), 2500);
       } else {
-        // User not found in mock_users.json
-        toast.error("ليس لديك بطاقة");
+        const newUser = {
+          role: "citizen",
+          name: "New Citizen", // يمكن تحسين هذا لاحقًا
+          national_id: normalizedNationalId,
+          phone: normalizedPhone,
+          password: normalizedPassword,
+          email: values.email,
+          governorate: values.governorate,
+          district: values.district,
+          village: values.village || "",
+        };
+        const { success, message } = await addUser(newUser);
+        if (success) {
+          setUserData(newUser);
+          setIsLoggedIn(true);
+          navigate("/");
+        } else {
+          toast.error(message);
+        }
       }
     },
   });
@@ -133,7 +112,6 @@ const Signup = () => {
 
   return (
     <div className="d-flex flex-column flex-md-row" style={{ minHeight: "100vh", direction: "rtl" }}>
-      {/* Form section */}
       <div className="w-100 w-md-50 d-flex align-items-center justify-content-center p-3">
         <div
           className="w-100"
@@ -243,8 +221,6 @@ const Signup = () => {
           </form>
         </div>
       </div>
-
-      {/* Image section */}
       <div className="w-100 w-md-50 d-flex align-items-center justify-content-center p-3">
         <div style={{ maxHeight: "90vh", overflow: "hidden" }}>
           <img
@@ -259,7 +235,6 @@ const Signup = () => {
           />
         </div>
       </div>
-
       <ToastContainer />
     </div>
   );

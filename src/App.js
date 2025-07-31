@@ -29,7 +29,7 @@ return (
 <Route path="/bakerysignup" element={<BakerySignup/>} />
 <Route path="/login" element={<Login />} />
 <Route path="/dashboard" element={<Dashboard />} />
-<Route path="/reservations" element={<Reservations />} />
+<Route path="/reservation" element={<Reservations />} />
 <Route path="/logout" element={<Logout />} />
 <Route path="/profile" element={<Profile />} />
 </Routes>

@@ -30,7 +30,7 @@ const Logout = () => {
           <button className="logout-btn" onClick={() => navigate('/signup')}>
             تسجيل حساب جديد "مواطن"
           </button>
-          <button className="logout-btn" onClick={() => navigate('/bakery-signup')}>
+          <button className="logout-btn" onClick={() => navigate('/bakerysignup')}>
             تسجيل حساب جديد "صاحب مخبز"
           </button>
         </div>

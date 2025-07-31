@@ -5,11 +5,8 @@ import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import mockUsers from "../modules/mock_users.json";
-import { UserContext } from "../context/UserContext";
-import { addUser, getUser } from "../modules/registeredUsers";
+import { addUser, getBakerByNationalId } from "../modules/registeredUsers.js";
 import { useUser } from "../context/UserContext";
-import "../styles/auth.css";
 
 const governoratesData = {
   القاهرة: ["المعادي", "مصر الجديدة", "مدينة نصر", "حلوان", "الساحل", "شبرا"],
@@ -35,7 +32,7 @@ const governoratesData = {
 const BakerySignup = () => {
   const navigate = useNavigate();
   const [districts, setDistricts] = useState([]);
-  const { setUserData, setIsLoggedIn } = useUser();
+  const { setUserData, setIsLoggedIn, setUserType } = useUser(); // إضافة setUserType
 
   const formik = useFormik({
     initialValues: {
@@ -64,58 +61,43 @@ const BakerySignup = () => {
       district: Yup.string().required("المركز مطلوب"),
       village: Yup.string(),
     }),
-    onSubmit: (values) => {
+    onSubmit: async (values) => {
       const normalizedPhone = values.phone.trim();
       const normalizedNationalId = values.nationalId.trim();
       const normalizedPassword = values.password.trim();
 
-      // Check if user exists in mock_users.json
-      const existingUserInMock = mockUsers.bakers.find(
-        (baker) =>
-          baker.phone === normalizedPhone &&
-          baker.national_id === normalizedNationalId
-      );
+      // التحقق من bakers collection
+      const existingBaker = await getBakerByNationalId(normalizedNationalId);
+      let existingName = values.name;
 
-      if (existingUserInMock) {
-        // Check if user is already registered in localStorage
-        const existingUserInStorage = getUser(normalizedPhone, normalizedPassword);
-        if (existingUserInStorage) {
-          console.log("User already registered in localStorage:", existingUserInStorage);
-          toast.info("لديك حساب بالفعل", {
-            position: "top-right",
-            autoClose: 2000, // Display for 2 seconds
-          });
-          setTimeout(() => {
-            navigate("/login");
-          }, 2500); // Navigate after 2.5 seconds to ensure toast is visible
-        } else {
-          // Add user to localStorage if not registered
-          const newUser = {
-            role: "baker",
-            name: values.name,
-            national_id: normalizedNationalId,
-            phone: normalizedPhone,
-            password: normalizedPassword,
-            bakery_name: values.bakeryName,
-            governorate: values.governorate,
-            district: values.district,
-            village: values.village || "",
-            location: `${values.district}, ${values.governorate}`, // Simplified location
-          };
-          const { success, message } = addUser(newUser);
-          if (success) {
-            console.log("User added to localStorage:", newUser);
-            // Set user data and login state in context
-            setUserData(newUser);
-            setIsLoggedIn(true);
-            navigate("/");
-          } else {
-            toast.error(message);
-          }
-        }
+      if (existingBaker) {
+        existingName = existingBaker.name || values.name; // استخدام الاسم من bakers إذا وجد
+        toast.info("الرقم القومي موجود بالفعل، تم استخدام الاسم المسجل.", {
+          position: "top-right",
+          autoClose: 2000,
+        });
+      }
+
+      const newUser = {
+        role: "baker", // الاحتفاظ بـ role كـ baker
+        name: existingName,
+        national_id: normalizedNationalId,
+        phone: normalizedPhone,
+        password: normalizedPassword,
+        bakery_name: values.bakeryName,
+        governorate: values.governorate,
+        district: values.district,
+        village: values.village || "",
+        location: `${values.district}, ${values.governorate}`,
+      };
+      const { success, message } = await addUser(newUser);
+      if (success) {
+        setUserData(newUser);
+        setIsLoggedIn(true);
+        setUserType("owner"); // تعيين userType إلى owner عند التسجيل الناجح
+        navigate("/");
       } else {
-        // User not found in mock_users.json
-        toast.error("ليس لديك بطاقة");
+        toast.error(message);
       }
     },
   });
@@ -134,7 +116,6 @@ const BakerySignup = () => {
 
   return (
     <div className="d-flex flex-column flex-md-row" style={{ minHeight: "100vh", direction: "rtl" }}>
-      {/* Form section */}
       <div className="w-100 w-md-50 d-flex align-items-center justify-content-center p-3">
         <div
           className="w-100"
@@ -151,9 +132,7 @@ const BakerySignup = () => {
           <h2 className="text-center mb-4" style={{ color: "#4A2C2A", fontFamily: "Aref Ruqaa" }}>
             تسجيل المخبز
           </h2>
-
           <form onSubmit={formik.handleSubmit} noValidate>
-            {/* Name */}
             <div className="mb-3">
               <label htmlFor="name" className="form-label">الاسم</label>
               <input
@@ -167,8 +146,6 @@ const BakerySignup = () => {
               />
               {getFieldError("name")}
             </div>
-
-            {/* National ID */}
             <div className="mb-3">
               <label htmlFor="nationalId" className="form-label">الرقم القومي</label>
               <input
@@ -182,8 +159,6 @@ const BakerySignup = () => {
               />
               {getFieldError("nationalId")}
             </div>
-
-            {/* Phone */}
             <div className="mb-3">
               <label htmlFor="phone" className="form-label">رقم الهاتف</label>
               <input
@@ -197,8 +172,6 @@ const BakerySignup = () => {
               />
               {getFieldError("phone")}
             </div>
-
-            {/* Password */}
             <div className="mb-3">
               <label htmlFor="password" className="form-label">كلمة المرور</label>
               <input
@@ -212,8 +185,6 @@ const BakerySignup = () => {
               />
               {getFieldError("password")}
             </div>
-
-            {/* Bakery Name */}
             <div className="mb-3">
               <label htmlFor="bakeryName" className="form-label">اسم المخبز</label>
               <input
@@ -227,8 +198,6 @@ const BakerySignup = () => {
               />
               {getFieldError("bakeryName")}
             </div>
-
-            {/* Governorate */}
             <div className="mb-3">
               <label htmlFor="governorate" className="form-label">المحافظة</label>
               <select
@@ -246,8 +215,6 @@ const BakerySignup = () => {
               </select>
               {getFieldError("governorate")}
             </div>
-
-            {/* District */}
             <div className="mb-3">
               <label htmlFor="district" className="form-label">المركز</label>
               <select
@@ -266,8 +233,6 @@ const BakerySignup = () => {
               </select>
               {getFieldError("district")}
             </div>
-
-            {/* Village */}
             <div className="mb-3">
               <label htmlFor="village" className="form-label">القرية (اختياري)</label>
               <input
@@ -280,8 +245,6 @@ const BakerySignup = () => {
                 value={formik.values.village}
               />
             </div>
-
-            {/* Submit Button */}
             <button type="submit" className="btn w-100 mt-3" style={{ backgroundColor: "#E0B243", color: "#FFFFFF", fontSize: "18px" }}>
               تسجيل
             </button>
@@ -294,8 +257,6 @@ const BakerySignup = () => {
           </form>
         </div>
       </div>
-
-      {/* Image section */}
       <div className="w-100 w-md-50 d-flex align-items-center justify-content-center p-3">
         <div style={{ maxHeight: "90vh", overflow: "hidden" }}>
           <img
@@ -310,7 +271,6 @@ const BakerySignup = () => {
           />
         </div>
       </div>
-
       <ToastContainer />
     </div>
   );
