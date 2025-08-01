@@ -1,18 +1,14 @@
 import { db } from '../services/firebase.js';
-import { doc, getDoc, setDoc, collection, getDocs } from 'firebase/firestore';
+import { doc, getDoc, setDoc, collection, getDocs, query, where } from 'firebase/firestore';
 
-export const getCitizenByPhone = async (phone, password) => {
-  try {
-    const citizensCollection = collection(db, 'citizens');
-    const citizensSnapshot = await getDocs(citizensCollection);
-    const citizen = citizensSnapshot.docs
-      .map(doc => doc.data())
-      .find(c => c.phone === phone && c.password === password);
-    return citizen || null;
-  } catch (error) {
-    console.error("Error fetching citizen:", error);
-    return null;
+export const getCitizenByPhone = async (phone) => {
+  const citizensRef = collection(db, "citizens");
+  const q = query(citizensRef, where("phone", "==", phone));
+  const querySnapshot = await getDocs(q);
+  if (!querySnapshot.empty) {
+    return querySnapshot.docs[0].data();
   }
+  return null;
 }; 
 
 export async function getAllUsers() {
@@ -49,12 +45,13 @@ export async function addUser(newUser) {
 
 export const getUser = async (phone, password) => {
   try {
-    const usersCollection = collection(db, 'registered_users'); // توحيد الاسم
+    const usersCollection = collection(db, 'registered_users');
     const usersSnapshot = await getDocs(usersCollection);
-    const user = usersSnapshot.docs
-      .map(doc => doc.data())
-      .find(u => u.phone.trim() === phone.trim() && u.password.trim() === password.trim()); // تنظيف البيانات
-    console.log("User found:", user); // لتسجيل النتيجة
+    console.log("Total documents in registered_users:", usersSnapshot.size); // تسجيل عدد المستندات
+    const userData = usersSnapshot.docs.map(doc => doc.data());
+    console.log("All user data:", userData); // تسجيل جميع البيانات
+    const user = userData.find(u => u.phone.trim() === phone.trim() && u.password.trim() === password.trim());
+    console.log("User found:", user); // تسجيل النتيجة
     return user || null;
   } catch (error) {
     console.error("Error fetching user:", error);

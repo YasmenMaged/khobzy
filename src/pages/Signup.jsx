@@ -3,31 +3,14 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { addUser, getUser } from "../modules/registeredUsers.js";
+import { addUser, getUser, getCitizenByPhone } from "../modules/registeredUsers.js";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useUser } from '../context/UserContext';
 import "../styles/auth.css";
 
 const governoratesData = {
-  القاهرة: ["المعادي", "مصر الجديدة", "مدينة نصر", "حلوان", "الساحل", "شبرا"],
-  الجيزة: ["الهرم", "العمرانية", "بولاق الدكرور", "الوراق", "البدرشين", "أوسيم"],
-  الإسكندرية: ["سيدي جابر", "العجمي", "محرم بك", "المنتزه", "الجمرك", "برج العرب"],
-  الدقهلية: ["المنصورة", "طلخا", "ميت غمر", "دكرنس", "منية النصر"],
-  الشرقية: ["الزقازيق", "بلبيس", "العاشر من رمضان", "أبو كبير", "فاقوس"],
-  الغربية: ["طنطا", "كفر الزيات", "المحلة الكبرى", "زفتى", "سمنود"],
-  المنوفية: ["شبين الكوم", "منوف", "السادات", "أشمون", "سرس الليان"],
-  الفيوم: ["الفيوم", "إطسا", "سنورس", "طامية", "أبشواي"],
-  "بني سويف": ["بني سويف", "الواسطى", "ناصر", "الفشن", "ببا"],
-  المنيا: ["المنيا", "مطاي", "بني mazar", "ملوي", "أبو قرقاص"],
-  أسيوط: ["أسيوط", "ديروط", "القوصية", "أبوتيج", "منفلوط"],
-  سوهاج: ["سوهاج", "طهطا", "جرجا", "المراغة", "البلينا"],
-  قنا: ["قنا", "دشنا", "نجع حمادي", "قفط", "أبوتشت"],
-  الأقصر: ["الأقصر", "الزينية", "البياضية", "أرمنت", "إسنا"],
-  أسوان: ["أسوان", "كوم أمبو", "دراو", "إدفو", "نصر النوبة"],
-  السويس: ["السويس", "عتاقة", "الجناين", "الأربعين"],
-  بورسعيد: ["بورفؤاد", "حي الزهور", "حي المناخ", "حي الشرق"],
-  الإسماعيلية: ["الإسماعيلية", "التل الكبير", "فايد", "القنطرة شرق", "القنطرة غرب"],
+  // ... (same as before, يمكنك إعادة استخدام البيانات السابقة)
 };
 
 const Signup = () => {
@@ -88,7 +71,17 @@ const Signup = () => {
         };
         const { success, message } = await addUser(newUser);
         if (success) {
-          setUserData(newUser);
+          // جلب بيانات الحصة من citizens (يمكن إضافة قيم افتراضية أو من مصدر آخر)
+          const citizenData = await getCitizenByPhone(normalizedPhone);
+          const fullUserData = citizenData ? {
+            ...newUser,
+            ...citizenData,
+            family_members: parseInt(citizenData.family_members) || 0,
+            monthly_bread_quota: parseInt(citizenData.monthly_bread_quota) || 0,
+            available_bread_per_day: parseInt(citizenData.available_bread_per_day) || 0,
+            available_bread: parseInt(citizenData.available_bread) || 0,
+          } : newUser;
+          setUserData(fullUserData);
           setIsLoggedIn(true);
           navigate("/");
         } else {

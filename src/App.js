@@ -12,6 +12,7 @@ import UserTypeSelection from './pages/UserTypeSelection.jsx';
 import { UserContextProvider } from './context/UserContext.js';
 import Logout from './pages/Logout.jsx';
 import Profile from './pages/Profile.jsx';
+import ReservationHistory from './pages/ReservationHistory.jsx';
 
 function AppContent() {
 const location = useLocation();
@@ -32,6 +33,7 @@ return (
 <Route path="/reservation" element={<Reservations />} />
 <Route path="/logout" element={<Logout />} />
 <Route path="/profile" element={<Profile />} />
+<Route path="/reservation-history" element={<ReservationHistory/>} />
 </Routes>
 {!hideNavFooter && <Footer />}
 </>

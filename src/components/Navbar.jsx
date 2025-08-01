@@ -81,13 +81,20 @@ const Navbar = () => {
                 الصفحة الرئيسية
               </Link>
             </li>
-            {userType === 'owner' && (
+            {userType === 'owner' ? 
               <li className="nav-item">
                 <Link className="nav-link" to="/dashboard">
                   لوحة التحكم
                 </Link>
               </li>
-            )}
+              :
+              <li className="nav-item">
+                <Link className="nav-link" to="/reservation-history">
+                  طلباتي 
+                </Link>
+              </li>
+
+            }
             {!isLoggedIn && (
               <>
                 <li className="nav-item">

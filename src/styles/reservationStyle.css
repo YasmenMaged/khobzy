@@ -1,0 +1,143 @@
+body {
+  font-family: 'Aref Ruqaa', serif;
+  background-color: #F5F1E8;
+  margin: 0;
+  padding: 0;
+  color: #4A2C2A;
+  direction: rtl;
+}
+
+.reservation-container ,
+.reservationH-container {
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 20px;
+}
+.reservationH-container{
+ max-width: 1200px;
+}
+
+
+.header {
+  text-align: center;
+  padding: 20px;
+  background: linear-gradient(135deg, #FDFAF6 0%, #ECE1D6 100%);
+  border-radius: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  border: 1px solid #d99a2b33;
+}
+
+.header h1 {
+  font-size: 2.5rem;
+  color: #D99A2B;
+  margin: 0;
+}
+
+.header svg {
+  margin-left: 10px;
+  color: #D99A2B;
+  font-size: 1.5rem;
+  padding: 8px;
+  background-color: #ECE1D6;
+  border-radius: 50%;
+}
+
+.reservation-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f8ece4 100%);
+  border-radius: 15px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  padding: 20px;
+  border: 1px solid #e0b24333;
+}
+
+.info-row {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  font-size: 1.5rem;
+  color: #6B4E31;
+  margin-bottom: 15px;
+}
+
+.info-row span:first-child , label {
+  color: #D99A2B;
+  font-weight: bold;
+}
+
+
+.quantity-input {
+  margin: 20px 0;
+}
+
+.quantity-input label {
+  font-size: 1.2rem;
+  margin-right: 10px;
+}
+
+.quantity-input input {
+  padding: 8px;
+  font-size: 1rem;
+  border: 1px solid #e0b24333;
+  border-radius: 5px;
+  width: 80px;
+}
+
+.reserve-btn {
+  background-color: #D99A2B;
+  color: #FFFFFF;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.reserve-btn:hover {
+  background-color: #c58622;
+}
+
+.error {
+  color: red;
+  text-align: center;
+  margin: 10px 0;
+}
+
+.success {
+  color: green;
+  text-align: center;
+  margin: 10px 0;
+}
+
+
+/* ... (الأنماط السابقة) ... */
+
+.custom-select {
+  padding: 10px;
+  font-size: 1.2rem;
+  border: 2px solid #e0b24333;
+  border-radius: 8px;
+  width: 150px;
+  margin-right: 10px;
+  background-color: #ffffff;
+  color: #4A2C2A;
+  appearance: none; /* إزالة الأسلوب الافتراضي للسياق */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23D99A2B' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: left 10px center;
+  padding-left: 30px; /* مساحة للأيقونة */
+  cursor: pointer;
+}
+
+.custom-select:focus {
+  outline: none;
+  border-color: #D99A2B;
+  box-shadow: 0 0 8px rgba(217, 154, 43, 0.6);
+}
+
+.custom-select option {
+  background-color: #ffffff;
+  color: #4A2C2A;
+  padding: 10px;
+}

@@ -2,7 +2,7 @@ import React from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useNavigate, Link } from "react-router-dom";
-import { getUser } from "../modules/registeredUsers.js";
+import { getUser, getCitizenByPhone } from "../modules/registeredUsers.js";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useUser } from "../context/UserContext";
@@ -30,10 +30,25 @@ const Login = () => {
       const normalizedPassword = password.trim();
 
       const user = await getUser(normalizedPhone, normalizedPassword);
-      console.log("Fetched user:", user); // لتسجيل النتيجة
+      console.log("Fetched user:", user);
       if (user) {
         const updatedUserType = user.role === 'baker' ? 'owner' : user.role;
-        setUserData(user);
+        // جلب بيانات الحصة من citizens
+        const citizenData = await getCitizenByPhone(normalizedPhone);
+        if (citizenData && user.role === 'citizen') {
+          const fullUserData = {
+            ...user,
+            ...citizenData,
+            phone: normalizedPhone,
+            family_members: parseInt(citizenData.family_members) || 0,
+            monthly_bread_quota: parseInt(citizenData.monthly_bread_quota) || 0,
+            available_bread_per_day: parseInt(citizenData.available_bread_per_day) || 0,
+            available_bread: parseInt(citizenData.available_bread) || 0,
+          };
+          setUserData(fullUserData);
+        } else {
+          setUserData({ ...user, phone: normalizedPhone });
+        }
         setIsLoggedIn(true);
         setUserType(updatedUserType);
         navigate('/');
@@ -125,7 +140,7 @@ const Login = () => {
           </form>
         </div>
       </div>
-      <div className="w-100 w-md-50 d-flex align-items-center justify-content-center p-3">
+      <div className="w-100 w-md-50 d-none d-md-flex align-items-center justify-content-center p-3">
         <div style={{ maxHeight: "90vh", overflow: "hidden" }}>
           <img
             src={require('../assets/login1.avif')}
