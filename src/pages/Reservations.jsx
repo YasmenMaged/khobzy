@@ -4,6 +4,14 @@ import { UserContext } from '../context/UserContext';
 import '../styles/reservationStyle.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBreadSlice } from '@fortawesome/free-solid-svg-icons';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { initializeApp } from 'firebase/app';
+import { getFirestore, collection, addDoc } from 'firebase/firestore';
+import { firebaseConfig } from '../services/firebase';
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
 const Reservation = () => {
   const location = useLocation();
@@ -13,7 +21,6 @@ const Reservation = () => {
   const [days, setDays] = useState(1);
   const [selectedTime, setSelectedTime] = useState('09:00');
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
   const [quantity, setQuantity] = useState(0);
 
   const calculateQuantity = () => {
@@ -23,7 +30,7 @@ const Reservation = () => {
       return 0;
     }
     const baseQuantity = familyMembers * 5 * days;
-    const maxBread = userData?.available_bread || 50; // التحقق من الرغيف المتاح من userData
+    const maxBread = userData?.available_bread || 50;
     return Math.min(baseQuantity, maxBread);
   };
 
@@ -37,33 +44,37 @@ const Reservation = () => {
     }
   }, [baker]);
 
-  const handleReservation = () => {
+  const handleReservation = async () => {
     const maxBread = userData?.available_bread || 50;
     if (quantity > maxBread) {
       setError(`الكمية المطلوبة (${quantity}) تتجاوز المتاح (${maxBread} رغيف).`);
-      setSuccess('');
     } else if (quantity <= 0) {
       setError('الكمية يجب أن تكون أكبر من صفر.');
-      setSuccess('');
     } else {
-      // تحديث الرغيف المتاح في userData
       const newAvailableBread = userData.available_bread - quantity;
       setUserData({ ...userData, available_bread: newAvailableBread });
 
-      // إضافة الحجز إلى السجل
-      const reservation = {
-        date: new Date().toLocaleDateString(),
-        quantity: quantity,
-        bakeryName: baker.bakery_name || 'غير محدد',
-        time: selectedTime,
-      };
-      const reservations = JSON.parse(localStorage.getItem('reservations') || '[]');
-      reservations.push(reservation);
-      localStorage.setItem('reservations', JSON.stringify(reservations));
-
-      setSuccess(`تم الحجز بنجاح! ${quantity} رغيف لمدة ${days} أيام في ${selectedTime}`);
-      setError('');
-      setTimeout(() => navigate('/reservation-history'), 2000);
+      try {
+        await addDoc(collection(db, 'reservations'), {
+          userId: userData.phone,
+          bakerId: baker.phone || baker.national_id,
+          date: new Date().toLocaleDateString(),
+          quantity: quantity,
+          bakeryName: baker.bakery_name || 'غير محدد',
+          time: selectedTime,
+          confirmed: false,
+          timestamp: new Date(),
+        });
+        toast.success(`تم حجز الموعد! ${quantity} رغيف لمدة ${days} أيام في ${selectedTime}`, {
+          position: 'top-right',
+          autoClose: 2000,
+        });
+        setError('');
+        setTimeout(() => navigate('/reservation-history'), 2000);
+      } catch (error) {
+        setError('فشل في حفظ الحجز. حاول مجددًا.');
+        console.error('Error adding reservation: ', error);
+      }
     }
   };
 
@@ -126,7 +137,6 @@ const Reservation = () => {
           </select>
         </div>
         {error && <div className="error">{error}</div>}
-        {success && <div className="success">{success}</div>}
         <button className="reserve-btn" onClick={handleReservation}>
           تأكيد الحجز
         </button>

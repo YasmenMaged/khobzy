@@ -5,16 +5,24 @@ import { getAllUsers } from '../modules/registeredUsers';
 import { useUser } from '../context/UserContext';
 import '../styles/dashboard.css';
 import '../styles/auth.css';
+import { initializeApp } from 'firebase/app';
+import { getFirestore, collection, query, where, getDocs, updateDoc, doc } from 'firebase/firestore';
+import { firebaseConfig } from '../services/firebase';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
 const Dashboard = () => {
-  const { userType } = useUser();
+  const { userType, userData } = useUser();
   const [users, setUsers] = useState([]);
+  const [reservations, setReservations] = useState([]);
   const location = useLocation();
   const navigate = useNavigate();
-  const [newOrdersCount, setNewOrdersCount] = useState(3);
+  const [newOrdersCount, setNewOrdersCount] = useState(0);
 
   useEffect(() => {
-    // التحقق من نوع المستخدم عند التحميل
     if (userType !== 'owner') {
       navigate('/');
       return;
@@ -22,24 +30,46 @@ const Dashboard = () => {
 
     const fetchUsers = async () => {
       try {
-        const registeredUsers = await getAllUsers(); // افتراض أنها async
+        const registeredUsers = await getAllUsers();
         const allUsers = [
           ...mockUsers.citizens,
           ...mockUsers.bakers,
-          ...(Array.isArray(registeredUsers) ? registeredUsers : []), // التحقق من أنها مصفوفة
+          ...(Array.isArray(registeredUsers) ? registeredUsers : []),
         ];
         setUsers(allUsers);
       } catch (error) {
         console.error("Error fetching users:", error);
-        setUsers([...mockUsers.citizens, ...mockUsers.bakers]); // استخدام البيانات المحلية كبديل
+        setUsers([...mockUsers.citizens, ...mockUsers.bakers]);
       }
     };
+
+    const fetchReservations = async () => {
+      if (!userData?.phone) return;
+      const q = query(collection(db, 'reservations'), where('bakerId', '==', userData.phone));
+      const querySnapshot = await getDocs(q);
+      const reservationsList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setReservations(reservationsList);
+      setNewOrdersCount(reservationsList.filter(res => !res.confirmed).length);
+    };
+
     fetchUsers();
-  }, [userType, navigate]);
+    fetchReservations();
+  }, [userType, navigate, userData]);
 
   const handleLogout = () => {
-    localStorage.removeItem('userToken'); // افتراضي، قم بتعديله حسب تخزينك
+    localStorage.removeItem('userToken');
     navigate('/login');
+  };
+
+  const handleConfirmReservation = async (reservationId) => {
+    const reservationRef = doc(db, 'reservations', reservationId);
+    await updateDoc(reservationRef, { confirmed: true });
+    const updatedReservations = reservations.map(res =>
+      res.id === reservationId ? { ...res, confirmed: true } : res
+    );
+    setReservations(updatedReservations);
+    setNewOrdersCount(updatedReservations.filter(r => !r.confirmed).length);
+    toast.success('تم تأكيد الطلب بنجاح!', { position: 'top-right', autoClose: 2000 });
   };
 
   const sidebarLinks = [
@@ -50,90 +80,74 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className="dashboard" style={{ position: 'relative' }}>
-      <div className="sidebar-bg"></div>
-      <div className="sidebar">
+    <div className="dashboard" style={{ display: 'flex', height: '100vh', backgroundColor: '#F5F1E8' }}>
+      <div className="sidebar" style={{ width: '250px', backgroundColor: '#4A2C2A', color: '#fff', padding: '20px' }}>
         <div className="sidebar-header">
-          <h5 className="sidebar-title">لوحة التحكم</h5>
+          <h5 className="sidebar-title" style={{ fontSize: '1.5rem', fontFamily: 'Aref Ruqaa' }}>لوحة التحكم</h5>
         </div>
-        <ul className="sidebar-nav">
+        <ul className="sidebar-nav" style={{ listStyle: 'none', padding: 0 }}>
           {sidebarLinks.map((link) => (
             <li className="nav-item mb-2" key={link.path}>
               <Link
                 className={`sidebar-link ${location.pathname === link.path ? 'active' : ''}`}
                 to={link.path}
+                style={{ display: 'block', color: '#fff', textDecoration: 'none', padding: '10px', fontFamily: 'Aref Ruqaa' }}
               >
-                <span className="arabic-text">{link.text}</span>
-                {link.count && <span className="sidebar-count">{link.count}</span>}
+                <span>{link.text}</span>
+                {link.count && <span style={{ backgroundColor: '#D99A2B', borderRadius: '50%', padding: '2px 8px', marginLeft: '10px' }}>{link.count}</span>}
               </Link>
             </li>
           ))}
           <li className="nav-item mb-2">
-            <button className="sidebar-link logout-btn" onClick={handleLogout}>
-              <span className="arabic-text">تسجيل الخروج</span>
+            <button className="sidebar-link logout-btn" onClick={handleLogout} style={{ width: '100', background: 'none', border: 'none', color: '#fff', textAlign: 'left', padding: '10px', fontFamily: 'Aref Ruqaa' }}>
+              تسجيل الخروج
             </button>
           </li>
         </ul>
       </div>
 
-      <div className="main-content">
-        <h5 className="dashboard-title">لوحة التحكم</h5>
-        <div className="stats-grid">
-          <div className="stat-column">
-            <div className="column-title">إعداد الطلبات اليوم</div>
-            <div className="stat-item progress-ring-container">
-              <div className="progress-ring" style={{ '--p': 50 }} data-label="50%"></div>
-            </div>
+      <div className="main-content" style={{ flex: 1, padding: '20px', backgroundColor: '#fff', borderRadius: '15px', margin: '20px' }}>
+        <h5 className="dashboard-title" style={{ color: '#4A2C2A', fontSize: '1.8rem', fontFamily: 'Aref Ruqaa' }}>لوحة التحكم</h5>
+        <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px', marginBottom: '20px' }}>
+          <div className="stat-column" style={{ backgroundColor: '#FDFAF6', padding: '15px', borderRadius: '10px', textAlign: 'center' }}>
+            <div className="column-title" style={{ color: '#6B4E31', fontSize: '1.2rem' }}>إعداد الطلبات اليوم</div>
+            <div className="stat-item" style={{ fontSize: '1.5rem', color: '#D99A2B' }}>50%</div>
           </div>
-          <div className="stat-column">
-            <div className="column-title">التغليف اليوم</div>
-            <div className="stat-item progress-ring-container">
-              <div className="progress-ring" style={{ '--p': 20 }} data-label="20%"></div>
-            </div>
+          <div className="stat-column" style={{ backgroundColor: '#FDFAF6', padding: '15px', borderRadius: '10px', textAlign: 'center' }}>
+            <div className="column-title" style={{ color: '#6B4E31', fontSize: '1.2rem' }}>التغليف اليوم</div>
+            <div className="stat-item" style={{ fontSize: '1.5rem', color: '#D99A2B' }}>20%</div>
           </div>
-          <div className="stat-column">
-            <div className="column-title">الرغيف الباقي</div>
-            <div className="stat-item progress-ring-container">
-              <div className="progress-ring" style={{ '--p': 30 }} data-label="30%"></div>
-            </div>
+          <div className="stat-column" style={{ backgroundColor: '#FDFAF6', padding: '15px', borderRadius: '10px', textAlign: 'center' }}>
+            <div className="column-title" style={{ color: '#6B4E31', fontSize: '1.2rem' }}>الرغيف الباقي</div>
+            <div className="stat-item" style={{ fontSize: '1.5rem', color: '#D99A2B' }}>30%</div>
           </div>
-          <div className="stat-column">
-            <div className="column-title">الإشغال</div>
-            <div className="stat-item progress-ring-container">
-              <div className="progress-ring" style={{ '--p': 75 }} data-label="75%"></div>
-            </div>
+          <div className="stat-column" style={{ backgroundColor: '#FDFAF6', padding: '15px', borderRadius: '10px', textAlign: 'center' }}>
+            <div className="column-title" style={{ color: '#6B4E31', fontSize: '1.2rem' }}>الإشغال</div>
+            <div className="stat-item" style={{ fontSize: '1.5rem', color: '#D99A2B' }}>75%</div>
           </div>
         </div>
 
-        <h5 className="dashboard-title mt-4">الطلبات الحالية</h5>
-        <table className="table table-bordered">
-          <thead className="table-light">
-            <tr>
-              <th>اسم العميل</th>
-              <th>وقت الحجز</th>
-              <th>الكمية</th>
-              <th>حالة الطلب</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((user, index) => (
-              <tr key={index}>
-                <td>{user.name || user.bakery_name || 'غير محدد'}</td>
-                <td>{new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</td>
-                <td>{user.quantity || 1}</td>
-                <td>محجوز</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
-        <div className="mt-4">
-          <h5 className="dashboard-title">سجل الطلبات</h5>
-          <div className="form-group mt-3">
-            <label htmlFor="production">كم رغيف هتنتج بكرة؟</label>
-            <input type="number" className="form-control w-25" id="production" defaultValue="200" />
-            <button className="btn mt-2 button">تحديث</button>
-          </div>
+        <h5 className="dashboard-title" style={{ color: '#4A2C2A', fontSize: '1.8rem', fontFamily: 'Aref Ruqaa' }}>الطلبات الحالية</h5>
+        <div className="orders-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
+          {reservations.map((res) => (
+            <div key={res.id} style={{ backgroundColor: '#FDFAF6', padding: '15px', borderRadius: '10px', textAlign: 'center' }}>
+              <div style={{ color: '#6B4E31', fontSize: '1.2rem' }}>اسم العميل: {users.find(u => u.phone === res.userId)?.name || 'غير محدد'}</div>
+              <div style={{ color: '#6B4E31', fontSize: '1.2rem' }}>التاريخ: {res.date}</div>
+              <div style={{ color: '#6B4E31', fontSize: '1.2rem' }}>الكمية: {res.quantity} رغيف</div>
+              <div style={{ color: '#6B4E31', fontSize: '1.2rem' }}>الوقت: {res.time}</div>
+              <div style={{ color: res.confirmed ? '#28a745' : '#dc3545', fontSize: '1.2rem' }}>
+                {res.confirmed ? 'تم التأكيد' : 'قيد المراجعة'}
+              </div>
+              {!res.confirmed && (
+                <button
+                  onClick={() => handleConfirmReservation(res.id)}
+                  style={{ backgroundColor: '#D99A2B', color: '#fff', border: 'none', padding: '5px 10px', borderRadius: '5px', marginTop: '10px' }}
+                >
+                  تأكيد
+                </button>
+              )}
+            </div>
+          ))}
         </div>
       </div>
     </div>
