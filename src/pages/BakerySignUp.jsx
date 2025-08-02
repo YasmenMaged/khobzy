@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { addUser, getBakerByNationalId } from "../modules/registeredUsers.js";
+import { addUser, getBakerByNationalId, getBakeryByOwnerId, setBakeryData } from "../modules/registeredUsers.js";
 import { useUser } from "../context/UserContext";
 
 const governoratesData = {
@@ -32,7 +32,7 @@ const governoratesData = {
 const BakerySignup = () => {
   const navigate = useNavigate();
   const [districts, setDistricts] = useState([]);
-  const { setUserData, setIsLoggedIn, setUserType } = useUser(); // إضافة setUserType
+  const { setUserData, setIsLoggedIn, setUserType } = useUser();
 
   const formik = useFormik({
     initialValues: {
@@ -71,15 +71,31 @@ const BakerySignup = () => {
       let existingName = values.name;
 
       if (existingBaker) {
-        existingName = existingBaker.name || values.name; // استخدام الاسم من bakers إذا وجد
+        existingName = existingBaker.name || values.name;
         toast.info("الرقم القومي موجود بالفعل، تم استخدام الاسم المسجل.", {
           position: "top-right",
           autoClose: 2000,
         });
       }
 
+      // جلب بيانات المخبز من bakeries collection
+      const bakeryData = await getBakeryByOwnerId(normalizedNationalId);
+      let dailyQuota = 100; // قيمة افتراضية إذا لم يكن هناك بيانات
+      if (bakeryData && bakeryData.daily_quota) {
+        dailyQuota = bakeryData.daily_quota;
+      } else {
+        // إذا لم يكن هناك بيانات، أنشئ سجلًا جديدًا في bakeries
+        await setBakeryData(normalizedNationalId, {
+          owners_national_id: normalizedNationalId,
+          bakery_name: values.bakeryName,
+          daily_quota: dailyQuota,
+          remaining_quota: dailyQuota,
+          last_reset_date: new Date().toISOString().split('T')[0],
+        });
+      }
+
       const newUser = {
-        role: "baker", // الاحتفاظ بـ role كـ baker
+        role: "baker",
         name: existingName,
         national_id: normalizedNationalId,
         phone: normalizedPhone,
@@ -89,13 +105,14 @@ const BakerySignup = () => {
         district: values.district,
         village: values.village || "",
         location: `${values.district}, ${values.governorate}`,
+        daily_quota: dailyQuota, // إضافة حصة اليوم
       };
       const { success, message } = await addUser(newUser);
       if (success) {
         setUserData(newUser);
         setIsLoggedIn(true);
-        setUserType("owner"); // تعيين userType إلى owner عند التسجيل الناجح
-        navigate("/");
+        setUserType("owner");
+        navigate("/over-view"); // توجيه مباشر إلى النظرف العامة
       } else {
         toast.error(message);
       }

@@ -1,5 +1,46 @@
 import { db } from '../services/firebase.js';
-import { doc, getDoc, setDoc, collection, getDocs, query, where } from 'firebase/firestore';
+import { doc, getDoc, setDoc, collection, getDocs, query, where, updateDoc, getFirestore } from 'firebase/firestore';
+
+export const setBakeryData = async (nationalId, data) => {
+
+  const bakeryRef = doc(db, 'bakeries', nationalId);
+  await setDoc(bakeryRef, data, { merge: true });
+  return { success: true, message: 'تم تحديث بيانات المخبز' };
+};
+export async function getBakeryByOwnerId(nationalId) {
+  try {
+    const bakeryRef = doc(db, 'bakeries', nationalId); // افتراض أن national_id هو المفتاح
+    const bakeryDoc = await getDoc(bakeryRef);
+    if (bakeryDoc.exists()) {
+      return { id: bakeryDoc.id, ...bakeryDoc.data() };
+    }
+    return null;
+  } catch (error) {
+    console.error("Error fetching bakery:", error);
+    return null;
+  }
+}
+
+export const updateCitizenQuota = async (phone, newQuota = null) => {
+  try {
+    const q = query(collection(db, 'citizens'), where('phone', '==', phone));
+    const querySnapshot = await getDocs(q);
+    if (!querySnapshot.empty) {
+      const citizenDoc = querySnapshot.docs[0];
+      const citizenData = citizenDoc.data();
+      if (newQuota) {
+        await updateDoc(doc(db, 'citizens', citizenDoc.id), { available_bread: newQuota });
+        return { ...citizenData, available_bread: newQuota };
+      }
+      return citizenData; // إرجاع آخر قيمة محفوظة
+    }
+    return null;
+  } catch (error) {
+    console.error("Error updating citizen quota:", error);
+    return null;
+  }
+};
+
 
 export const getCitizenByPhone = async (phone) => {
   const citizensRef = collection(db, "citizens");

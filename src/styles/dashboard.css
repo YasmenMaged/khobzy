@@ -25,7 +25,16 @@ body {
   min-height: 100vh;
   position: relative;
 }
-
+.header-bg {
+  text-align: center;
+  padding: 20px;
+  background: linear-gradient(135deg, #FDFAF6 0%, #ECE1D6 100%);
+  border-radius: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  border: 1px solid #d99a2b33;
+ 
+}
 .sidebar-bg {
   position: fixed;
   top: 0;
@@ -145,11 +154,12 @@ body {
 }
 
 .column-title {
-  background-color: var(--sidebar-active);
+  background-color: #E0B243;
   color: white;
   margin: 0;
   padding: 15px;
   font-size: 1.1rem;
+  border-radius:10px
 }
 
 .stat-item {

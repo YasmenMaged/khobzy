@@ -92,7 +92,6 @@ const HomePage = () => {
           </div>
         </header>
       </div>
-      {error && <div style={{ color: 'red', textAlign: 'center', margin: '20px' }}>{error}</div>}
       {userData && userData.role === 'citizen' && (
         <section className="additional-data-section p-4" style={{ backgroundColor: '#F9F5F1', paddingBottom: '40px' }}>
           <div className="additional-data-content p-5 my-5 mx-auto" style={{

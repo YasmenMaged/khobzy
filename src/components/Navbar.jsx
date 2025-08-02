@@ -5,7 +5,7 @@ import '../styles/navbar.css';
 import Swal from 'sweetalert2';
 
 const Navbar = () => {
-  const { userType, isLoggedIn, setIsLoggedIn, setUserData } = useUser(); // إضافة setIsLoggedIn وsetUserData
+  const { userType, isLoggedIn, setIsLoggedIn, setUserData, userData } = useUser();
   const navigate = useNavigate();
 
   const swalWithBootstrapButtons = Swal.mixin({
@@ -29,16 +29,16 @@ const Navbar = () => {
       })
       .then((result) => {
         if (result.isConfirmed) {
-          // تحديث حالة الجلسة
+          console.log('Logging out user:', userData);
           setIsLoggedIn(false);
-          setUserData(null);
-          localStorage.removeItem('userToken'); // افتراضي، قم بتعديله حسب تخزينك
+          setUserData({}); // تعيين userData إلى كائن فارغ بدلاً من null
+          localStorage.removeItem('userToken'); // إزالة التوكن إذا كان موجودًا
           swalWithBootstrapButtons.fire({
             title: 'تم تسجيل الخروج!',
             text: 'تم تسجيل الخروج بنجاح.',
             icon: 'success',
           }).then(() => {
-            navigate('/logout'); // إعادة التوجيه بعد تأكيد النجاح
+            navigate('/login'); // إعادة التوجيه إلى صفحة تسجيل الدخول
           });
         } else if (result.dismiss === Swal.DismissReason.cancel) {
           swalWithBootstrapButtons.fire({
@@ -81,20 +81,20 @@ const Navbar = () => {
                 الصفحة الرئيسية
               </Link>
             </li>
-            {userType === 'owner' ? 
+            {isLoggedIn && userType === 'citizen' && (
+              <li className="nav-item">
+                <Link className="nav-link" to="/reservation-history">
+                  طلباتي
+                </Link>
+              </li>
+            )}
+            {isLoggedIn && userType === 'owner' && (
               <li className="nav-item">
                 <Link className="nav-link" to="/dashboard">
                   لوحة التحكم
                 </Link>
               </li>
-              :
-              <li className="nav-item">
-                <Link className="nav-link" to="/reservation-history">
-                  طلباتي 
-                </Link>
-              </li>
-
-            }
+            )}
             {!isLoggedIn && (
               <>
                 <li className="nav-item">

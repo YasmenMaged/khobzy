@@ -15,40 +15,43 @@ import Profile from './pages/Profile.jsx';
 import ReservationHistory from './pages/ReservationHistory.jsx';
 
 function AppContent() {
-const location = useLocation();
-const hideNavFooterRoutes = ['/signup','/login','/bakerysignup']; // نقدر نضيف مسارات تانية هنا
+  const location = useLocation();
+  const hideNavFooterRoutes = ['/signup', '/login', '/bakerysignup']; // نقدر نضيف مسارات تانية هنا
 
-const hideNavFooter = hideNavFooterRoutes.includes(location.pathname);
+  const hideNavFooter = hideNavFooterRoutes.includes(location.pathname);
 
-return (
-<>
-{!hideNavFooter && <Navbar />}
-<Routes>
-<Route path="/" element={<Home />} />
-<Route path="/choose-role" element={<UserTypeSelection />} />
-<Route path="/signup" element={<Signup />} />
-<Route path="/bakerysignup" element={<BakerySignup/>} />
-<Route path="/login" element={<Login />} />
-<Route path="/dashboard" element={<Dashboard />} />
-<Route path="/reservation" element={<Reservations />} />
-<Route path="/logout" element={<Logout />} />
-<Route path="/profile" element={<Profile />} />
-<Route path="/reservation-history" element={<ReservationHistory/>} />
-</Routes>
-{!hideNavFooter && <Footer />}
-</>
-);
+  return (
+    <>
+      {!hideNavFooter && <Navbar />}
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/choose-role" element={<UserTypeSelection />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/bakerysignup" element={<BakerySignup />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/over-view" element={<Dashboard />} />
+        <Route path="/orders" element={<Dashboard />} />
+        <Route path="/order-history" element={<Dashboard />} />
+        <Route path="/production" element={<Dashboard />} />
+        <Route path="/reservation" element={<Reservations />} />
+        <Route path="/logout" element={<Logout />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/reservation-history" element={<ReservationHistory />} />
+      </Routes>
+      {!hideNavFooter && <Footer />}
+    </>
+  );
 }
 
 function App() {
-return (
-<UserContextProvider>
-<BrowserRouter>
-<AppContent />
-</BrowserRouter>
-</UserContextProvider>
-);
+  return (
+    <UserContextProvider>
+      <BrowserRouter>
+        <AppContent />
+      </BrowserRouter>
+    </UserContextProvider>
+  );
 }
 
 export default App;
-
