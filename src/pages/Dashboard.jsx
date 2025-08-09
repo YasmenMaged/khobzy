@@ -164,7 +164,7 @@ const Dashboard = () => {
         ).length
       );
       toast.success("تم تأكيد طلب العميل بنجاح!", {
-        position: "top-right",
+        position: "bottom-left",
         autoClose: 2000,
       });
     } else {
@@ -542,7 +542,7 @@ const Dashboard = () => {
                 style={{
                   textAlign: "center",
                   color: "#d64931ff",
-                  fontSize: "2rem",
+                  fontSize: "1.5rem",
                   height: "100%",
                   marginRight:'50%',
                   display: "flex",

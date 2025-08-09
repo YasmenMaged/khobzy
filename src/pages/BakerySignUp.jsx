@@ -5,7 +5,13 @@ import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { addUser, getAllUsers, getBakerByNationalId, getBakeryByOwnerId, setBakeryData } from "../modules/registeredUsers.js";
+import {
+  addUser,
+  getAllUsers,
+  getBakerByNationalId,
+  getBakeryByOwnerId,
+  setBakeryData
+} from "../modules/registeredUsers.js";
 import { useUser } from "../context/UserContext";
 
 const governoratesData = {
@@ -66,9 +72,21 @@ const BakerySignup = () => {
       const normalizedNationalId = values.nationalId.trim();
       const normalizedPassword = values.password.trim();
 
-      // التحقق من وجود الرقم القومي والهاتف معًا في registered_users
+      // ✅ التحقق من وجود الرقم القومي ورقم الهاتف في bakers
+      const bakerData = await getBakerByNationalId(normalizedNationalId);
+      if (!bakerData || bakerData.phone !== normalizedPhone) {
+        toast.error("ليس لديك مخبز", {
+          position: "top-right",
+          autoClose: 2000,
+        });
+        return; // إيقاف العملية بالكامل
+      }
+
+      // التحقق من وجود المستخدم مسبقًا
       const allUsers = await getAllUsers();
-      const matchingUser = allUsers.find(u => u.phone === normalizedPhone && u.national_id === normalizedNationalId);
+      const matchingUser = allUsers.find(
+        u => u.phone === normalizedPhone && u.national_id === normalizedNationalId
+      );
       if (matchingUser) {
         toast.info("لديك حساب بالفعل", {
           position: "top-right",
@@ -76,13 +94,6 @@ const BakerySignup = () => {
         });
         setTimeout(() => navigate("/login"), 2500);
         return;
-      }
-
-      // التحقق من bakers
-      const bakerData = await getBakerByNationalId(normalizedNationalId);
-      let existingName = values.name;
-      if (bakerData) {
-        existingName = bakerData.name || values.name;
       }
 
       // إنشاء بيانات المخبز إذا لم تكن موجودة
@@ -102,7 +113,7 @@ const BakerySignup = () => {
 
       const newUser = {
         role: "baker",
-        name: existingName,
+        name: bakerData.name || values.name,
         national_id: normalizedNationalId,
         phone: normalizedPhone,
         password: normalizedPassword,
@@ -153,80 +164,42 @@ const BakerySignup = () => {
           }}
         >
           <h2 className="text-center mb-4" style={{ color: "#D99A2B", fontFamily: "Aref Ruqaa" }}>
-            تسجيل المخبز
+            إنشاء حساب صاحب مخبز
           </h2>
           <form onSubmit={formik.handleSubmit} noValidate>
+            {["name", "nationalId", "phone", "password", "bakeryName"].map((field) => (
+              <div className="mb-3" key={field}>
+                <label htmlFor={field} className="form-label" style={{ color: "#2E1C1A" }}>
+                  {{
+                    name: "الاسم",
+                    nationalId: "الرقم القومي",
+                    phone: "رقم التليفون",
+                    password: "كلمة المرور",
+                    bakeryName: "اسم المخبز",
+                  }[field]}
+                </label>
+                <input
+                  type={field === "password" ? "password" : "text"}
+                  id={field}
+                  name={field}
+                  className="form-control"
+                  style={{ backgroundColor: "#E5E5E5" }}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values[field]}
+                />
+                {getFieldError(field)}
+              </div>
+            ))}
             <div className="mb-3">
-              <label htmlFor="name" className="form-label" style={{color: "#2E1C1A"}}>الاسم</label>
-              <input
-                id="name"
-                name="name"
-                type="text"
-                className="form-control"
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                value={formik.values.name}
-              />
-              {getFieldError("name")}
-            </div>
-            <div className="mb-3">
-              <label htmlFor="nationalId" className="form-label" style={{color: "#2E1C1A"}}>الرقم القومي</label>
-              <input
-                id="nationalId"
-                name="nationalId"
-                type="text"
-                className="form-control"
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                value={formik.values.nationalId}
-              />
-              {getFieldError("nationalId")}
-            </div>
-            <div className="mb-3">
-              <label htmlFor="phone" className="form-label" style={{color: "#2E1C1A"}}>رقم الهاتف</label>
-              <input
-                id="phone"
-                name="phone"
-                type="text"
-                className="form-control"
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                value={formik.values.phone}
-              />
-              {getFieldError("phone")}
-            </div>
-            <div className="mb-3">
-              <label htmlFor="password" className="form-label" style={{color: "#2E1C1A"}}>كلمة المرور</label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                className="form-control"
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                value={formik.values.password}
-              />
-              {getFieldError("password")}
-            </div>
-            <div className="mb-3">
-              <label htmlFor="bakeryName" className="form-label" style={{color: "#2E1C1A"}}>اسم المخبز</label>
-              <input
-                id="bakeryName"
-                name="bakeryName"
-                type="text"
-                className="form-control"
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                value={formik.values.bakeryName}
-              />
-              {getFieldError("bakeryName")}
-            </div>
-            <div className="mb-3">
-              <label htmlFor="governorate" className="form-label" style={{color: "#2E1C1A"}}>المحافظة</label>
+              <label htmlFor="governorate" className="form-label" style={{ color: "#2E1C1A" }}>
+                المحافظة
+              </label>
               <select
                 id="governorate"
                 name="governorate"
                 className="form-select custom-select"
+                style={{ backgroundColor: "#E5E5E5" }}
                 onChange={handleGovernorateChange}
                 onBlur={formik.handleBlur}
                 value={formik.values.governorate}
@@ -239,11 +212,14 @@ const BakerySignup = () => {
               {getFieldError("governorate")}
             </div>
             <div className="mb-3">
-              <label htmlFor="district" className="form-label" style={{color: "#2E1C1A"}}>المركز</label>
+              <label htmlFor="district" className="form-label" style={{ color: "#2E1C1A" }}>
+                المركز
+              </label>
               <select
                 id="district"
                 name="district"
                 className="form-select custom-select"
+                style={{ backgroundColor: "#E5E5E5" }}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 value={formik.values.district}
@@ -257,16 +233,20 @@ const BakerySignup = () => {
               {getFieldError("district")}
             </div>
             <div className="mb-3">
-              <label htmlFor="village" className="form-label" style={{color: "#2E1C1A"}}>القرية (اختياري)</label>
+              <label htmlFor="village" className="form-label" style={{ color: "#2E1C1A" }}>
+                القرية (اختياري)
+              </label>
               <input
+                type="text"
                 id="village"
                 name="village"
-                type="text"
                 className="form-control"
+                style={{ backgroundColor: "#E5E5E5" }}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 value={formik.values.village}
               />
+              {getFieldError("village")}
             </div>
             <button type="submit" className="btn w-100 mt-3" style={{ backgroundColor: "#E0B243", color: "#FFFFFF", fontSize: "18px" }}>
               تسجيل

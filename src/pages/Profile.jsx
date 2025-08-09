@@ -200,29 +200,15 @@ const swalWithBootstrapButtons = Swal.mixin({
                     <>
                       <div className="field-group">
                         <label style={{ fontSize: '1.2rem', color: '#4A2C2A' }}><i className="fas fa-id-card" style={{ marginRight: '10px', color: '#d99a2b', padding: '5px' }}></i>الرقم القومي:</label>
-                        {editMode ? (
-                          <input
-                            type="text"
-                            value={editedData.national_id || ''}
-                            onChange={(e) => setEditedData({ ...editedData, national_id: e.target.value })}
-                            style={{ width: '100%', padding: '8px', backgroundColor: '#E5E5E5', borderRadius: '5px', border: '1px solid #e0b24333' }}
-                          />
-                        ) : (
                           <p style={{ fontSize: '1.2rem' }}>{userData.national_id}</p>
-                        )}
+                       
+                         
                       </div>
                       <div className="field-group">
                         <label style={{ fontSize: '1.2rem', color: '#4A2C2A' }}><i className="fas fa-phone" style={{ marginRight: '10px', color: '#d99a2b', padding: '5px' }}></i>رقم الهاتف:</label>
-                        {editMode ? (
-                          <input
-                            type="text"
-                            value={editedData.phone || ''}
-                            onChange={(e) => setEditedData({ ...editedData, phone: e.target.value })}
-                            style={{ width: '100%', padding: '8px', backgroundColor: '#E5E5E5', borderRadius: '5px', border: '1px solid #e0b24333' }}
-                          />
-                        ) : (
                           <p style={{ fontSize: '1.2rem' }}>{userData.phone}</p>
-                        )}
+                        
+                        
                       </div>
                       <div className="field-group">
                         <label style={{ fontSize: '1.2rem', color: '#4A2C2A' }}><i className="fas fa-shop" style={{ marginRight: '10px', color: '#d99a2b', padding: '5px' }}></i>اسم المخبز:</label>

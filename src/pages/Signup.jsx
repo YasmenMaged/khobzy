@@ -67,7 +67,19 @@ const Signup = () => {
       const normalizedNationalId = values.nationalId.trim();
       const normalizedPassword = values.password.trim();
 
-      // التحقق من وجود الرقم القومي والهاتف معًا في registered_users
+      // التحقق من أن الرقم القومي ورقم الهاتف موجودين في citizens
+      const citizenById = await getCitizenByNationalId(normalizedNationalId);
+      const citizenByPhone = await getCitizenByPhone(normalizedPhone);
+
+      if (!citizenById || !citizenByPhone || citizenById.phone !== normalizedPhone) {
+        toast.error("ليس لديك بطاقة تموينية", {
+          position: "top-right",
+          autoClose: 2000,
+        });
+        return;
+      }
+
+      // التحقق من وجود المستخدم مسبقًا
       const allUsers = await getAllUsers();
       const matchingUser = allUsers.find(u => u.phone === normalizedPhone && u.national_id === normalizedNationalId);
       if (matchingUser) {
@@ -79,31 +91,26 @@ const Signup = () => {
         return;
       }
 
-      // التحقق من citizens
-      const citizenData = await getCitizenByPhone(normalizedPhone) || await getCitizenByNationalId(normalizedNationalId);
-      if (citizenData) {
-        const newUser = {
-          role: "citizen",
-          name: "New Citizen",
-          national_id: normalizedNationalId,
-          phone: normalizedPhone,
-          password: normalizedPassword,
-          email: values.email,
-          governorate: values.governorate,
-          district: values.district,
-          village: values.village || "",
-          ...citizenData,
-        };
-        const { success, message } = await addUser(newUser);
-        if (success) {
-          setUserData(newUser);
-          setIsLoggedIn(true);
-          navigate("/");
-        } else {
-          toast.error(message);
-        }
+      // إنشاء مستخدم جديد
+      const newUser = {
+        role: "citizen",
+        name: citizenById.name || "New Citizen",
+        national_id: normalizedNationalId,
+        phone: normalizedPhone,
+        password: normalizedPassword,
+        email: values.email,
+        governorate: values.governorate,
+        district: values.district,
+        village: values.village || "",
+        ...citizenById,
+      };
+      const { success, message } = await addUser(newUser);
+      if (success) {
+        setUserData(newUser);
+        setIsLoggedIn(true);
+        navigate("/");
       } else {
-        toast.error("لا يوجد بيانات مواطن مرتبطة بهذا الرقم القومي أو الهاتف");
+        toast.error(message);
       }
     },
   });
