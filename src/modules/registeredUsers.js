@@ -103,7 +103,7 @@ export const getUser = async (phone, password) => {
 // دوال جديدة للتحقق من citizen و bakers
 export async function getCitizenByNationalId(nationalId) {
   try {
-    const citizensCol = collection(db, 'citizen');
+    const citizensCol = collection(db, 'citizens');
     const snapshot = await getDocs(citizensCol);
     let foundCitizen = null;
     snapshot.forEach((doc) => {

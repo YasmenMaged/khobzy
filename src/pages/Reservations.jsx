@@ -16,7 +16,7 @@ const db = getFirestore(app);
 const Reservation = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { userData, setUserData } = useContext(UserContext);
+  const { userData, setUserData, refreshUserData } = useContext(UserContext);
   const { baker } = location.state || {};
   const [days, setDays] = useState(1);
   const [selectedTime, setSelectedTime] = useState('09:00');
@@ -31,23 +31,32 @@ const Reservation = () => {
       return 0;
     }
     const baseQuantity = familyMembers * 5 * days;
-    const maxBread = userData?.available_bread || 50;
-    if (baseQuantity > maxBread) {
-      setError(`الكمية المطلوبة (${baseQuantity}) تتجاوز الحد الأقصى المتاح (${maxBread} رغيف).`);
-      return maxBread;
-    }
-    return baseQuantity;
+    return baseQuantity; // لا قيود هنا، فقط الحساب
   };
 
   const checkExistingReservationForDay = async (date) => {
     if (!userData?.phone || !date) return false;
     const q = query(
       collection(db, 'reservations'),
-      where('phone', '==', userData.phone),
-      where('date', '==', date)
+      where('phone', '==', userData.phone)
     );
     const querySnapshot = await getDocs(q);
-    return !querySnapshot.empty;
+    const existingReservations = querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+      date: new Date(doc.data().date).toISOString().split('T')[0]
+    }));
+
+    for (const res of existingReservations) {
+      const start = new Date(res.date);
+      const end = new Date(start);
+      end.setDate(start.getDate() + (res.days || 1) - 1);
+      const checkDate = new Date(date).toISOString().split('T')[0];
+      if (checkDate >= start.toISOString().split('T')[0] && checkDate <= end.toISOString().split('T')[0]) {
+        return true;
+      }
+    }
+    return false;
   };
 
   const getDateRange = () => {
@@ -89,9 +98,15 @@ const Reservation = () => {
       toast.error('لا يمكن الحجز في تاريخ سابق.', { position: 'top-right', autoClose: 1000 });
       return;
     }
+    if (maxBread === 0) {
+      setError('تم نفاذ الحصة الشهرية.');
+      toast.error('تم نفاذ الحصة الشهرية.', { position: 'top-right', autoClose: 2000 });
+      setTimeout(() => navigate('/'), 2000);
+      return;
+    }
     if (quantity > maxBread) {
       setError(`الكمية المطلوبة (${quantity}) تتجاوز المتاح (${maxBread} رغيف).`);
-      toast.error(`الكمية المطلوبة تتجاوز المتاح (${maxBread} رغيف).`, { position: 'top-right', autoClose: 2000 });
+      toast.error(`الرغيف المطلوب أكثر من المتاح لديك حاليًا.`, { position: 'top-right', autoClose: 2000 });
       return;
     }
     if (quantity <= 0) {
@@ -112,12 +127,33 @@ const Reservation = () => {
       }
     }
 
-    const newAvailableBread = userData.available_bread - quantity;
+    const newAvailableBread = Math.max(0, userData.available_bread - quantity);
+    if (newAvailableBread < 0) {
+      setError('تم نفاذ الحصة الشهرية.');
+      toast.error('تم نفاذ الحصة الشهرية.', { position: 'top-right', autoClose: 2000 });
+      setTimeout(() => navigate('/'), 2000);
+      return;
+    }
+
     try {
+      await refreshUserData(userData.phone); // تحديث البيانات الحالية من Firebase
+      const updatedMaxBread = userData.available_bread; // استخدام القيمة المحدثة
+      if (updatedMaxBread === 0) {
+        setError('تم نفاذ الحصة الشهرية.');
+        toast.error('تم نفاذ الحصة الشهرية.', { position: 'top-right', autoClose: 2000 });
+        setTimeout(() => navigate('/'), 2000);
+        return;
+      }
+      if (quantity > updatedMaxBread) {
+        setError(`الكمية المطلوبة (${quantity}) تتجاوز المتاح (${updatedMaxBread} رغيف).`);
+        toast.error(`الرغيف المطلوب أكثر من المتاح لديك حاليًا.`, { position: 'top-right', autoClose: 2000 });
+        return;
+      }
+
       const startDate = new Date(reservationDate).toISOString().split('T')[0];
       const reservationRef = await addDoc(collection(db, 'reservations'), {
         phone: userData.phone,
-        bakery_owner_national_id: baker.national_id, // استخدام national_id من baker
+        bakery_owner_national_id: baker.national_id,
         date: startDate,
         quantity: quantity,
         bakery: baker.bakery_name || 'غير محدد',
@@ -138,10 +174,7 @@ const Reservation = () => {
       }
       await updateDoc(citizenRef, { available_bread: newAvailableBread });
 
-      const updatedUserData = { ...userData, available_bread: newAvailableBread };
-      setUserData(updatedUserData);
-      localStorage.setItem('userData', JSON.stringify(updatedUserData));
-
+      await refreshUserData(userData.phone); // تحديث البيانات بعد الحجز
       toast.success('تم حجز الموعد بنجاح!', { position: 'top-right', autoClose: 2000 });
       setTimeout(() => navigate('/reservation-history'), 2000);
     } catch (error) {
@@ -154,7 +187,7 @@ const Reservation = () => {
   };
 
   const timeOptions = [];
-  for (let hour = 9; hour < 14; hour++) {
+  for (let hour = 8; hour < 14; hour++) {
     for (let minute = 0; minute < 60; minute += 10) {
       const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
       timeOptions.push(time);
@@ -166,7 +199,7 @@ const Reservation = () => {
   return (
     <div className="reservation-container">
       <div className="header mt-4">
-        <h1 style={{color:'#4A2C2A'}}><FontAwesomeIcon icon={faBreadSlice} style={{ color: '#D99A2B', marginRight: '10px' }}/> حجز العيش</h1>
+        <h1 style={{color:'#4A2C2A'}}><FontAwesomeIcon icon={faBreadSlice} style={{ color: '#D99A2B', marginRight: '10px',fontFamily:'Aref Ruqaa' }}/> حجز العيش</h1>
       </div>
       <div className="reservation-card">
         <div className="info-row">
@@ -179,7 +212,7 @@ const Reservation = () => {
         </div>
         <div className="info-row">
           <span>الرغيف المتاح:</span>
-          <span>{userData?.available_bread || 'غير محدد'} رغيف</span>
+          <span>{userData?.available_bread === 0 ? '0 ' : userData?.available_bread || 'غير محدد'} رغيف</span>
         </div>
         <div className="quantity-input">
           <label htmlFor="reservationDate" style={{ fontSize: '1.4rem', paddingLeft: '10px' }}>اختر التاريخ:</label>

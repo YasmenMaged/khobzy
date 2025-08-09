@@ -21,7 +21,7 @@ const Logout = () => {
   return (
     <div className="logout-container">
       <div className="logout-content">
-        <h2 style={{ color: '#4A2C2A', fontFamily: 'Aref Ruqaa' }}>تم تسجيل الخروج بنجاح!</h2>
+        <h2 style={{ color: '#4A2C2A', fontFamily: 'Cairo' }}>تم تسجيل الخروج بنجاح!</h2>
         <p style={{ color: '#2E1C1A' }}>اختر ما تريد القيام به التالي:</p>
         <div className="button-group">
           <button className="logout-btn" onClick={() => navigate('/login')}>

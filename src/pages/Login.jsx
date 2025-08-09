@@ -88,7 +88,7 @@ const Login = () => {
         >
           <h2
             className="text-center mb-4"
-            style={{ color: "#4A2C2A", fontFamily: "Aref Ruqaa" }}
+            style={{ fontFamily: "Aref Ruqaa" ,color:'#D99A2B'}}
           >
             تسجيل الدخول
           </h2>

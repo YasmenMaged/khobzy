@@ -242,7 +242,7 @@ const Dashboard = () => {
                   color: "#fff",
                   textDecoration: "none",
                   padding: "10px",
-                  fontFamily: "Aref Ruqaa",
+                  fontFamily: "Cairo",
                 }}
               >
                 <span>{link.text}</span>
@@ -272,7 +272,8 @@ const Dashboard = () => {
                 color: "#fff",
                 textAlign: "left",
                 padding: "10px",
-                fontFamily: "Aref Ruqaa",
+                                 fontFamily: "Cairo",
+
               }}
             >
               تسجيل الخروج
@@ -301,7 +302,7 @@ const Dashboard = () => {
           style={{
             color: "#4A2C2A",
             fontSize: "2rem",
-            fontFamily: "Aref Ruqaa",
+            fontFamily: "Cairo",
             textAlign: "center",
             width: "80%",
             marginBottom: "40px",
@@ -435,6 +436,7 @@ const Dashboard = () => {
               alignItems: "center",
               height: "80vh",
               width: "60%",
+              onerflow:'scroll'
             }}
           >
             {reservations.filter(
@@ -456,6 +458,7 @@ const Dashboard = () => {
                       textAlign: "center",
                       width: "300px",
                       color: "#6B4E31",
+                      
                     }}
                   >
                     <div style={{ fontSize: "1.5rem" }}>

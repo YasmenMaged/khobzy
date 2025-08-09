@@ -38,7 +38,7 @@ const Navbar = () => {
             text: 'تم تسجيل الخروج بنجاح.',
             icon: 'success',
           }).then(() => {
-            navigate('/login'); // إعادة التوجيه إلى صفحة تسجيل الدخول
+            navigate('/login')
           });
         } else if (result.dismiss === Swal.DismissReason.cancel) {
           swalWithBootstrapButtons.fire({
@@ -90,7 +90,7 @@ const Navbar = () => {
             )}
             {isLoggedIn && userType === 'owner' && (
               <li className="nav-item">
-                <Link className="nav-link" to="/dashboard">
+                <Link className="nav-link" to="/over-view">
                   لوحة التحكم
                 </Link>
               </li>
@@ -98,7 +98,7 @@ const Navbar = () => {
             {!isLoggedIn && (
               <>
                 <li className="nav-item">
-                  <Link className="nav-link" to="/signup">
+                  <Link className="nav-link" to="/choose-role">
                     إنشاء حساب
                   </Link>
                 </li>

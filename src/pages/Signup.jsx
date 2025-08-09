@@ -3,14 +3,14 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { addUser, getUser, getCitizenByPhone } from "../modules/registeredUsers.js";
+import { addUser, getAllUsers, getCitizenByPhone, getCitizenByNationalId } from "../modules/registeredUsers.js";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useUser } from '../context/UserContext';
 import "../styles/auth.css";
 
 const governoratesData = {
-   القاهرة: ["المعادي", "مصر الجديدة", "مدينة نصر", "حلوان", "الساحل", "شبرا"],
+  القاهرة: ["المعادي", "مصر الجديدة", "مدينة نصر", "حلوان", "الساحل", "شبرا"],
   الجيزة: ["الهرم", "العمرانية", "بولاق الدكرور", "الوراق", "البدرشين", "أوسيم"],
   الإسكندرية: ["سيدي جابر", "العجمي", "محرم بك", "المنتزه", "الجمرك", "برج العرب"],
   الدقهلية: ["المنصورة", "طلخا", "ميت غمر", "دكرنس", "منية النصر"],
@@ -67,17 +67,24 @@ const Signup = () => {
       const normalizedNationalId = values.nationalId.trim();
       const normalizedPassword = values.password.trim();
 
-      const existingUser = await getUser(normalizedPhone, normalizedPassword);
-      if (existingUser) {
+      // التحقق من وجود الرقم القومي والهاتف معًا في registered_users
+      const allUsers = await getAllUsers();
+      const matchingUser = allUsers.find(u => u.phone === normalizedPhone && u.national_id === normalizedNationalId);
+      if (matchingUser) {
         toast.info("لديك حساب بالفعل", {
           position: "top-right",
           autoClose: 2000,
         });
         setTimeout(() => navigate("/login"), 2500);
-      } else {
+        return;
+      }
+
+      // التحقق من citizens
+      const citizenData = await getCitizenByPhone(normalizedPhone) || await getCitizenByNationalId(normalizedNationalId);
+      if (citizenData) {
         const newUser = {
           role: "citizen",
-          name: "New Citizen", // يمكن تحسين هذا لاحقًا
+          name: "New Citizen",
           national_id: normalizedNationalId,
           phone: normalizedPhone,
           password: normalizedPassword,
@@ -85,25 +92,18 @@ const Signup = () => {
           governorate: values.governorate,
           district: values.district,
           village: values.village || "",
+          ...citizenData,
         };
         const { success, message } = await addUser(newUser);
         if (success) {
-          // جلب بيانات الحصة من citizens (يمكن إضافة قيم افتراضية أو من مصدر آخر)
-          const citizenData = await getCitizenByPhone(normalizedPhone);
-          const fullUserData = citizenData ? {
-            ...newUser,
-            ...citizenData,
-            family_members: parseInt(citizenData.family_members) || 0,
-            monthly_bread_quota: parseInt(citizenData.monthly_bread_quota) || 0,
-            available_bread_per_day: parseInt(citizenData.available_bread_per_day) || 0,
-            available_bread: parseInt(citizenData.available_bread) || 0,
-          } : newUser;
-          setUserData(fullUserData);
+          setUserData(newUser);
           setIsLoggedIn(true);
           navigate("/");
         } else {
           toast.error(message);
         }
+      } else {
+        toast.error("لا يوجد بيانات مواطن مرتبطة بهذا الرقم القومي أو الهاتف");
       }
     },
   });
@@ -135,7 +135,7 @@ const Signup = () => {
             maxHeight: "90vh",
           }}
         >
-          <h2 className="text-center mb-4" style={{ color: "#4A2C2A", fontFamily: "Aref Ruqaa" }}>
+          <h2 className="text-center mb-4" style={{ color: "#D99A2B", fontFamily: "Aref Ruqaa" }}>
             إنشاء حساب خبزي
           </h2>
           <form onSubmit={formik.handleSubmit} noValidate>

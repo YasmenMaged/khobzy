@@ -16,9 +16,10 @@ import ReservationHistory from './pages/ReservationHistory.jsx';
 
 function AppContent() {
   const location = useLocation();
-  const hideNavFooterRoutes = ['/signup', '/login', '/bakerysignup']; // نقدر نضيف مسارات تانية هنا
-
+  const hideNavFooterRoutes = ['/signup', '/login', '/bakerysignup']; 
+   const hideFooterRoutes=['/dashboard','/over-view','/orders','/order-history'];
   const hideNavFooter = hideNavFooterRoutes.includes(location.pathname);
+  const hideFooter = hideFooterRoutes.includes(location.pathname);
 
   return (
     <>
@@ -29,7 +30,7 @@ function AppContent() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/bakerysignup" element={<BakerySignup />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+       
         <Route path="/over-view" element={<Dashboard />} />
         <Route path="/orders" element={<Dashboard />} />
         <Route path="/order-history" element={<Dashboard />} />
@@ -39,7 +40,7 @@ function AppContent() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/reservation-history" element={<ReservationHistory />} />
       </Routes>
-      {!hideNavFooter && <Footer />}
+      {!hideFooter && <Footer />}
     </>
   );
 }

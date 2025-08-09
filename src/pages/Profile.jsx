@@ -6,15 +6,17 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useSpring, animated } from 'react-spring';
 import { db } from '../services/firebase.js'; // استيراد Firestore من firebase.js
 import { doc, getDoc, setDoc } from 'firebase/firestore';
+import Swal from "sweetalert2";
 
 const fontAwesomeLink = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css";
 
 const Profile = () => {
-  const { userData, setUserData } = useUser();
+  const { userData, setUserData, setIsLoggedIn } = useUser();
   const [additionalData, setAdditionalData] = useState(null);
   const [editMode, setEditMode] = useState(false);
   const [editedData, setEditedData] = useState({});
   const navigate = useNavigate();
+  
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -48,10 +50,46 @@ const Profile = () => {
       });
     }
   };
-
+const swalWithBootstrapButtons = Swal.mixin({
+    customClass: {
+      confirmButton: 'btn btn-success m-2',
+      cancelButton: 'btn btn-danger m-2',
+    },
+    buttonsStyling: false,
+  });
   const handleLogout = () => {
-    navigate('/logout');
-  };
+     swalWithBootstrapButtons
+       .fire({
+         title: 'هل أنت متأكد؟',
+         text: 'لن تتمكن من التراجع عن هذا الإجراء!',
+         icon: 'warning',
+         showCancelButton: true,
+         confirmButtonText: 'نعم، قم بتسجيل الخروج!',
+         cancelButtonText: 'لا، إلغاء!',
+         reverseButtons: true,
+       })
+       .then((result) => {
+         if (result.isConfirmed) {
+           console.log('Logging out user:', userData);
+           setIsLoggedIn(false);
+           setUserData({}); // تعيين userData إلى كائن فارغ بدلاً من null
+           localStorage.removeItem('userToken'); // إزالة التوكن إذا كان موجودًا
+           swalWithBootstrapButtons.fire({
+             title: 'تم تسجيل الخروج!',
+             text: 'تم تسجيل الخروج بنجاح.',
+             icon: 'success',
+           }).then(() => {
+             navigate('/login')
+           });
+         } else if (result.dismiss === Swal.DismissReason.cancel) {
+           swalWithBootstrapButtons.fire({
+             title: 'تم الإلغاء',
+             text: 'جلسة العمل الخاصة بك آمنة :)',
+             icon: 'error',
+           });
+         }
+       });
+   };
 
   const springProps = useSpring({
     from: { opacity: 0, transform: 'translateY(50px)' },
@@ -72,7 +110,7 @@ const Profile = () => {
         }}>
           {userData && (
             <>
-              <h2 className="text-center mb-5" style={{ color: '#4A2C2A', fontFamily: 'Aref Ruqaa', fontSize: '2.5rem' }}>
+              <h2 className="text-center mb-5" style={{ color: '#4A2C2A', fontFamily: 'Cairo', fontSize: '2.5rem' }}>
                 <i className="fas fa-user" style={{ marginRight: '10px', color: '#d99a2b', padding: '5px' }}></i>
                 ملفي الشخصي
               </h2>
@@ -80,31 +118,29 @@ const Profile = () => {
                 <div className="user-details">
                   {userData.role === 'citizen' && (
                     <>
-                      <div className="field-group">
-                        <label style={{ fontSize: '1.2rem', color: '#4A2C2A' }}><i className="fas fa-id-card" style={{ marginRight: '10px', color: '#d99a2b', padding: '5px' }}></i>الرقم القومي:</label>
+                    <div className="field-group">
+                        <label style={{ fontSize: '1.2rem', color: '#4A2C2A' }}><i className="fas fa-user" style={{ marginRight: '10px', color: '#d99a2b', padding: '5px' }}></i>الاسم :</label>
                         {editMode ? (
                           <input
                             type="text"
-                            value={editedData.national_id || ''}
-                            onChange={(e) => setEditedData({ ...editedData, national_id: e.target.value })}
+                            value={editedData.name || ''}
+                            onChange={(e) => setEditedData({ ...editedData, name: e.target.value })}
                             style={{ width: '100%', padding: '8px', backgroundColor: '#E5E5E5', borderRadius: '5px', border: '1px solid #e0b24333' }}
                           />
                         ) : (
-                          <p style={{ fontSize: '1.2rem' }}>{userData.national_id}</p>
+                          <p style={{ fontSize: '1.2rem' }}>{userData.name}</p>
                         )}
                       </div>
                       <div className="field-group">
+                        <label style={{ fontSize: '1.2rem', color: '#4A2C2A' }}><i className="fas fa-id-card" style={{ marginRight: '10px', color: '#d99a2b', padding: '5px' }}></i>الرقم القومي:</label>
+                            <p style={{ fontSize: '1.2rem' }}>{userData.national_id}</p>
+                        
+                      </div>
+                      <div className="field-group">
                         <label style={{ fontSize: '1.2rem', color: '#4A2C2A' }}><i className="fas fa-phone" style={{ marginRight: '10px', color: '#d99a2b', padding: '5px' }}></i>رقم الهاتف:</label>
-                        {editMode ? (
-                          <input
-                            type="text"
-                            value={editedData.phone || ''}
-                            onChange={(e) => setEditedData({ ...editedData, phone: e.target.value })}
-                            style={{ width: '100%', padding: '8px', backgroundColor: '#E5E5E5', borderRadius: '5px', border: '1px solid #e0b24333' }}
-                          />
-                        ) : (
                           <p style={{ fontSize: '1.2rem' }}>{userData.phone}</p>
-                        )}
+                        
+                        
                       </div>
                       <div className="field-group">
                         <label style={{ fontSize: '1.2rem', color: '#4A2C2A' }}><i className="fas fa-envelope" style={{ marginRight: '10px', color: '#d99a2b', padding: '5px' }}></i>البريد الإلكتروني:</label>

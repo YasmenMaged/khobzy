@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { addUser, getBakerByNationalId, getBakeryByOwnerId, setBakeryData } from "../modules/registeredUsers.js";
+import { addUser, getAllUsers, getBakerByNationalId, getBakeryByOwnerId, setBakeryData } from "../modules/registeredUsers.js";
 import { useUser } from "../context/UserContext";
 
 const governoratesData = {
@@ -66,25 +66,29 @@ const BakerySignup = () => {
       const normalizedNationalId = values.nationalId.trim();
       const normalizedPassword = values.password.trim();
 
-      // التحقق من bakers collection
-      const existingBaker = await getBakerByNationalId(normalizedNationalId);
-      let existingName = values.name;
-
-      if (existingBaker) {
-        existingName = existingBaker.name || values.name;
-        toast.info("الرقم القومي موجود بالفعل، تم استخدام الاسم المسجل.", {
+      // التحقق من وجود الرقم القومي والهاتف معًا في registered_users
+      const allUsers = await getAllUsers();
+      const matchingUser = allUsers.find(u => u.phone === normalizedPhone && u.national_id === normalizedNationalId);
+      if (matchingUser) {
+        toast.info("لديك حساب بالفعل", {
           position: "top-right",
           autoClose: 2000,
         });
+        setTimeout(() => navigate("/login"), 2500);
+        return;
       }
 
-      // جلب بيانات المخبز من bakeries collection
+      // التحقق من bakers
+      const bakerData = await getBakerByNationalId(normalizedNationalId);
+      let existingName = values.name;
+      if (bakerData) {
+        existingName = bakerData.name || values.name;
+      }
+
+      // إنشاء بيانات المخبز إذا لم تكن موجودة
       const bakeryData = await getBakeryByOwnerId(normalizedNationalId);
-      let dailyQuota = 100; // قيمة افتراضية إذا لم يكن هناك بيانات
-      if (bakeryData && bakeryData.daily_quota) {
-        dailyQuota = bakeryData.daily_quota;
-      } else {
-        // إذا لم يكن هناك بيانات، أنشئ سجلًا جديدًا في bakeries
+      let dailyQuota = 100;
+      if (!bakeryData) {
         await setBakeryData(normalizedNationalId, {
           owners_national_id: normalizedNationalId,
           bakery_name: values.bakeryName,
@@ -92,6 +96,8 @@ const BakerySignup = () => {
           remaining_quota: dailyQuota,
           last_reset_date: new Date().toISOString().split('T')[0],
         });
+      } else {
+        dailyQuota = bakeryData.daily_quota || 100;
       }
 
       const newUser = {
@@ -105,14 +111,14 @@ const BakerySignup = () => {
         district: values.district,
         village: values.village || "",
         location: `${values.district}, ${values.governorate}`,
-        daily_quota: dailyQuota, // إضافة حصة اليوم
+        daily_quota: dailyQuota,
       };
       const { success, message } = await addUser(newUser);
       if (success) {
         setUserData(newUser);
         setIsLoggedIn(true);
         setUserType("owner");
-        navigate("/over-view"); // توجيه مباشر إلى النظرف العامة
+        navigate("/over-view");
       } else {
         toast.error(message);
       }
@@ -146,12 +152,12 @@ const BakerySignup = () => {
             maxHeight: "90vh",
           }}
         >
-          <h2 className="text-center mb-4" style={{ color: "#4A2C2A", fontFamily: "Aref Ruqaa" }}>
+          <h2 className="text-center mb-4" style={{ color: "#D99A2B", fontFamily: "Aref Ruqaa" }}>
             تسجيل المخبز
           </h2>
           <form onSubmit={formik.handleSubmit} noValidate>
             <div className="mb-3">
-              <label htmlFor="name" className="form-label">الاسم</label>
+              <label htmlFor="name" className="form-label" style={{color: "#2E1C1A"}}>الاسم</label>
               <input
                 id="name"
                 name="name"
@@ -164,7 +170,7 @@ const BakerySignup = () => {
               {getFieldError("name")}
             </div>
             <div className="mb-3">
-              <label htmlFor="nationalId" className="form-label">الرقم القومي</label>
+              <label htmlFor="nationalId" className="form-label" style={{color: "#2E1C1A"}}>الرقم القومي</label>
               <input
                 id="nationalId"
                 name="nationalId"
@@ -177,7 +183,7 @@ const BakerySignup = () => {
               {getFieldError("nationalId")}
             </div>
             <div className="mb-3">
-              <label htmlFor="phone" className="form-label">رقم الهاتف</label>
+              <label htmlFor="phone" className="form-label" style={{color: "#2E1C1A"}}>رقم الهاتف</label>
               <input
                 id="phone"
                 name="phone"
@@ -190,7 +196,7 @@ const BakerySignup = () => {
               {getFieldError("phone")}
             </div>
             <div className="mb-3">
-              <label htmlFor="password" className="form-label">كلمة المرور</label>
+              <label htmlFor="password" className="form-label" style={{color: "#2E1C1A"}}>كلمة المرور</label>
               <input
                 id="password"
                 name="password"
@@ -203,7 +209,7 @@ const BakerySignup = () => {
               {getFieldError("password")}
             </div>
             <div className="mb-3">
-              <label htmlFor="bakeryName" className="form-label">اسم المخبز</label>
+              <label htmlFor="bakeryName" className="form-label" style={{color: "#2E1C1A"}}>اسم المخبز</label>
               <input
                 id="bakeryName"
                 name="bakeryName"
@@ -216,7 +222,7 @@ const BakerySignup = () => {
               {getFieldError("bakeryName")}
             </div>
             <div className="mb-3">
-              <label htmlFor="governorate" className="form-label">المحافظة</label>
+              <label htmlFor="governorate" className="form-label" style={{color: "#2E1C1A"}}>المحافظة</label>
               <select
                 id="governorate"
                 name="governorate"
@@ -233,7 +239,7 @@ const BakerySignup = () => {
               {getFieldError("governorate")}
             </div>
             <div className="mb-3">
-              <label htmlFor="district" className="form-label">المركز</label>
+              <label htmlFor="district" className="form-label" style={{color: "#2E1C1A"}}>المركز</label>
               <select
                 id="district"
                 name="district"
@@ -251,7 +257,7 @@ const BakerySignup = () => {
               {getFieldError("district")}
             </div>
             <div className="mb-3">
-              <label htmlFor="village" className="form-label">القرية (اختياري)</label>
+              <label htmlFor="village" className="form-label" style={{color: "#2E1C1A"}}>القرية (اختياري)</label>
               <input
                 id="village"
                 name="village"

@@ -56,7 +56,14 @@ const ReservationHistory = () => {
   return (
     <div className="reservationH-container mt-4 pt-4">
       <div className="header mt-4">
-        <h1 style={{ color: "#4A2C2A", textAlign: "center", width: "80%" }}>
+        <h1
+          style={{
+            color: "#4A2C2A",
+            textAlign: "center",
+            width: "80%",
+            textAlign: "center",
+          }}
+        >
           <FontAwesomeIcon
             icon={faHistory}
             style={{ color: "#D99A2B", marginRight: "10px" }}
@@ -108,7 +115,7 @@ const ReservationHistory = () => {
                     gap: "15px",
                     fontSize: "1.8rem",
                     color: "#6B4E31",
-                    fontFamily: "Aref Ruqaa",
+                    fontFamily: "Cairo",
                   }}
                 >
                   <span style={{ color: "#D99A2B" }}>التاريخ:</span>
@@ -121,7 +128,7 @@ const ReservationHistory = () => {
                     gap: "15px",
                     fontSize: "1.8rem",
                     color: "#6B4E31",
-                    fontFamily: "Aref Ruqaa",
+                    fontFamily: "Cairo",
                     marginTop: "10px",
                   }}
                 >
@@ -135,7 +142,7 @@ const ReservationHistory = () => {
                     gap: "15px",
                     fontSize: "1.8rem",
                     color: "#6B4E31",
-                    fontFamily: "Aref Ruqaa",
+                    fontFamily: "Cairo",
                     marginTop: "10px",
                   }}
                 >
@@ -151,7 +158,7 @@ const ReservationHistory = () => {
                     gap: "15px",
                     fontSize: "1.8rem",
                     color: "#6B4E31",
-                    fontFamily: "Aref Ruqaa",
+                    fontFamily: "Cairo",
                     marginTop: "10px",
                   }}
                 >
@@ -165,7 +172,7 @@ const ReservationHistory = () => {
                     gap: "15px",
                     fontSize: "1.8rem",
                     color: "#6B4E31",
-                    fontFamily: "Aref Ruqaa",
+                    fontFamily: "Cairo",
                     marginTop: "10px",
                   }}
                 >
@@ -181,11 +188,7 @@ const ReservationHistory = () => {
                     backgroundColor: res.confirmed ? "#D4EAD2" : "#FFDFB3",
                   }}
                 >
-                  {res.confirmed ? (
-                    <p>تم تأكيد الطلب</p>
-                  ) : (
-                    <p>قيد المراجعة</p>
-                  )}
+                  {res.confirmed ? <p>تم تأكيد الطلب</p> : <p>قيد المراجعة</p>}
                 </div>
               </animated.div>
             ))}

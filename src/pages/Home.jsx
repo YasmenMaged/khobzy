@@ -108,36 +108,36 @@ const HomePage = () => {
             <div className="infographic-grid grid grid-cols-1 md:grid-cols-2 gap-6">
               <animated.div style={springProps} className="infographic-card p-4 bg-white rounded-lg shadow-md">
                 <i className="fas fa-users rounded-circle" style={{ fontSize: '1.5rem', color: '#4A2C2A', marginBottom: '10px', padding: '8px', backgroundColor: '#f8ece4' }}></i>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '15px', fontSize: '1.5rem', color: '#4A2C2A', fontFamily: 'Aref Ruqaa' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '15px', fontSize: '1.3rem', color: '#4A2C2A', fontFamily: 'Cairo' }}>
                   <span style={{color:'#DBA132'}}>أفراد الأسرة:</span>
                   <span>{userData.family_members}</span>
                 </div>
               </animated.div>
               <animated.div style={springProps} className="infographic-card p-4 bg-white rounded-lg shadow-md">
                 <i className="fas fa-clock rounded-circle" style={{ fontSize: '1.5rem', color: '#4A2C2A', marginBottom: '10px', padding: '8px', backgroundColor: '#f8ece4' }}></i>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '15px', fontSize: '1.5rem', color: '#4A2C2A', fontFamily: 'Aref Ruqaa' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '15px', fontSize: '1.3rem', color: '#4A2C2A', fontFamily: 'Cairo' }}>
                   <span style={{color:'#DBA132'}}>الرغيف اليومي:</span>
                   <span>{userData.available_bread_per_day} رغيف</span>
                 </div>
               </animated.div>
                <animated.div style={springProps} className="infographic-card p-4 bg-white rounded-lg shadow-md">
                 <i className="fas fa-check-circle rounded-circle" style={{ fontSize: '1.5rem', color: '#4A2C2A', marginBottom: '10px', padding: '8px', backgroundColor: '#f8ece4' }}></i>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '15px', fontSize: '1.5rem', color: '#4A2C2A', fontFamily: 'Aref Ruqaa' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '15px', fontSize: '1.3rem', color: '#4A2C2A', fontFamily: 'Cairo' }}>
                   <span style={{color:'#DBA132'}}>  الارغفه المتبقيه:</span>
                   <span>{userData.available_bread} رغيف</span>
                 </div>
               </animated.div>
               <animated.div style={springProps} className="infographic-card p-4 bg-white rounded-lg shadow-md">
                 <i className="fas fa-calendar-alt rounded-circle" style={{ fontSize: '1.5rem', color: '#4A2C2A', marginBottom: '10px', padding: '8px', backgroundColor: '#f8ece4' }}></i>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '15px', fontSize: '1.5rem', color: '#4A2C2A', fontFamily: 'Aref Ruqaa' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '15px', fontSize: '1.3rem', color: '#4A2C2A', fontFamily: 'Cairo' }}>
                   <span style={{color:'#DBA132'}}>الحصه الشهريه:</span>
                   <span>{userData.monthly_bread_quota} رغيف</span>
                 </div>
               </animated.div>
              
               <animated.div style={springProps} className="infographic-card p-4 bg-white rounded-lg shadow-md col-span-2">
-                <i className="fas fa-chart-pie rounded-circle" style={{ fontSize: '1.5rem', color: '#4A2C2A', marginBottom: '10px', padding: '8px', backgroundColor: '#f8ece4' }}></i>
-                <h3 style={{ fontFamily: 'Aref Ruqaa', fontSize: '1.5rem', color: '#DBA132' }}>نسبة الرغيف المتاح</h3>
+                <i className="fas fa-chart-pie rounded-circle" style={{ fontSize: '1.3rem', color: '#4A2C2A', marginBottom: '10px', padding: '8px', backgroundColor: '#f8ece4' }}></i>
+                <h3 style={{ fontFamily: 'Cairo', fontSize: '1.5rem', color: '#DBA132' }}>نسبة الرغيف المتاح</h3>
                 <div className="progress-container">
                   <p style={{ fontSize: '1.2rem', color: '#4A2C2A' }}>{Math.round(quotaPercentage)}%</p>
                   <div className="progress-bar-wrapper">
@@ -173,11 +173,11 @@ const HomePage = () => {
               {nearbyBakers.map((baker, index) => (
                 <animated.div key={index}  className="infographic-card p-4 bg-white rounded-lg shadow-md" style={{springProps, maxWidth: '300px', margin: '0 auto' }}>
                   <i className="fas fa-bread-slice rounded-circle" style={{ fontSize: '1.5rem', color: '#4A2C2A', marginBottom: '10px', padding: '8px', backgroundColor: '#ECE1D6' }}></i>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '15px', fontSize: '1.8rem', color: '#6B4E31', fontFamily: 'Aref Ruqaa' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '15px', fontSize: '1.3rem', color: '#6B4E31', fontFamily: 'Cairo' }}>
                     <span style={{ color: '#D99A2B' }}>اسم المخبز:</span>
                     <span style={{ fontSize: '1.5rem' }}>{baker.bakery_name || 'غير محدد'}</span>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '15px', fontSize: '1.8rem', color: '#6B4E31', fontFamily: 'Aref Ruqaa', marginTop: '10px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '15px', fontSize: '1.3rem', color: '#6B4E31', fontFamily: 'Cairo', marginTop: '10px' }}>
                     <span style={{ color: '#D99A2B' }}>الموقع:</span>
                     <span style={{ fontSize: '1.5rem' }}>{baker.location || 'غير محدد'}</span>
                   </div>
@@ -191,6 +191,7 @@ const HomePage = () => {
                       borderRadius: '5px',
                       border: 'none',
                       fontSize: '1rem',
+                      fontFamily: 'Cairo',
                     }}
                   >
                     احجز الآن

@@ -17,7 +17,7 @@ export const UserContextProvider = ({ children }) => {
   });
 
   useEffect(() => {
-    // جلب بيانات المستخدم عند التحميل الأولي أو تغيير حالة الدخول
+    // جلب بيانات المستخدم عند التحميل الأولي أو تغيير حالة الدخول أو رقم الهاتف
     const fetchUserData = async () => {
       if (isLoggedIn && userData.phone) {
         try {
@@ -43,8 +43,28 @@ export const UserContextProvider = ({ children }) => {
     fetchUserData();
   }, [isLoggedIn, userData.phone]);
 
+  // دالة مساعدة لتحديث البيانات من Firebase فورًا
+  const refreshUserData = async (phone) => {
+    if (phone) {
+      try {
+        const citizen = await getCitizenByPhone(phone);
+        if (citizen) {
+          setUserData({
+            ...userData,
+            family_members: parseInt(citizen.family_members) || 0,
+            monthly_bread_quota: parseInt(citizen.monthly_bread_quota) || 0,
+            available_bread_per_day: parseInt(citizen.available_bread_per_day) || 0,
+            available_bread: parseInt(citizen.available_bread) || 0,
+          });
+        }
+      } catch (err) {
+        console.error('خطأ أثناء تحديث بيانات المواطن:', err);
+      }
+    }
+  };
+
   return (
-    <UserContext.Provider value={{ userType, setUserType, isLoggedIn, setIsLoggedIn, userData, setUserData }}>
+    <UserContext.Provider value={{ userType, setUserType, isLoggedIn, setIsLoggedIn, userData, setUserData, refreshUserData }}>
       {children}
     </UserContext.Provider>
   );

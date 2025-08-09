@@ -1,11 +1,13 @@
 body {
   background-color: #f9f1e7;
-  font-family: Arial, sans-serif;
+   font-family: "Cairo", sans-serif;
   direction: rtl;
   margin: 0;
   padding: 0;
 }
-
+p,label{
+  font-weight: 300,
+}
 footer {
   background-color: #4a2c2a;
   color: #fff;

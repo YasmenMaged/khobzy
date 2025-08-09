@@ -9,7 +9,7 @@ const Footer = () => (
       color: "white",
       textAlign: "center",
       fontSize:'20px',
-      fontFamily: "Aref Ruqaa",
+      fontFamily: "Cairo", 
     }}
   >
     <p>© 2025 خبزك - جميع الحقوق محفوظة</p>
